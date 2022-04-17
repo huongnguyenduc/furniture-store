@@ -1,10 +1,8 @@
-module.exports = {
-  extends: ['mantine', 'plugin:@next/next/recommended'],
-  parserOptions: {
-    project: './tsconfig.json',
-  },
-
-  rules: {
-    'react/react-in-jsx-scope': 'off',
-  },
+export const extends = ['mantine', 'plugin:@next/next/recommended'];
+export const parserOptions = {
+  project: './tsconfig.json',
+};
+export const rules = {
+  'react/react-in-jsx-scope': 'off',
+  'linebreak-style': 0,
 };
