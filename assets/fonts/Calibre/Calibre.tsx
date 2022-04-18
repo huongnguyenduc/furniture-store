@@ -1,18 +1,18 @@
 import { Global } from '@mantine/core';
-import heavy from './CalibreBlack.otf';
-import heavyItalic from './CalibreBlackItalic.otf';
-import bold from './CalibreBold.otf';
-import boldItalic from './CalibreBoldItalic.otf';
-import semiBold from './CalibreSemiBold.otf';
-import semiBoldItalic from './CalibreSemiBoldItalic.otf';
-import medium from './CalibreMedium.otf';
-import mediumItalic from './CalibreMediumItalic.otf';
-import regular from './CalibreRegular.otf';
-import regularItalic from './CalibreRegularItalic.otf';
-import light from './CalibreLight.otf';
-import lightItalic from './CalibreLightItalic.otf';
-import thin from './CalibreThin.otf';
-import thinItalic from './CalibreThinItalic.otf';
+import heavy from '/assets/fonts/Calibre/CalibreBlack.otf';
+import heavyItalic from '/assets/fonts/Calibre/CalibreBlackItalic.otf';
+import bold from '/assets/fonts/Calibre/CalibreBold.otf';
+import boldItalic from '/assets/fonts/Calibre/CalibreBoldItalic.otf';
+import semiBold from '/assets/fonts/Calibre/CalibreSemiBold.otf';
+import semiBoldItalic from '/assets/fonts/Calibre/CalibreSemiBoldItalic.otf';
+import medium from '/assets/fonts/Calibre/CalibreMedium.otf';
+import mediumItalic from '/assets/fonts/Calibre/CalibreMediumItalic.otf';
+import regular from '/assets/fonts/Calibre/CalibreRegular.otf';
+import regularItalic from '/assets/fonts/Calibre/CalibreRegularItalic.otf';
+import light from '/assets/fonts/Calibre/CalibreLight.otf';
+import lightItalic from '/assets/fonts/Calibre/CalibreLightItalic.otf';
+import thin from '/assets/fonts/Calibre/CalibreThin.otf';
+import thinItalic from '/assets/fonts/Calibre/CalibreThinItalic.otf';
 
 export function Calibre() {
   return (
