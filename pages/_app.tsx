@@ -8,6 +8,7 @@ import { NotificationsProvider } from '@mantine/notifications';
 import { Calibre } from '../assets/fonts/Calibre/Calibre';
 import { theme } from '../config/theme';
 import Layout from '../components/Layout/Layout';
+import { SearchProvider } from '../components/SearchProvider/SearchProvider';
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   const { Component, pageProps } = props;
@@ -29,11 +30,13 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
       <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
         <Calibre />
         <MantineProvider theme={{ ...theme, colorScheme }} withGlobalStyles withNormalizeCSS>
-          <NotificationsProvider>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-          </NotificationsProvider>
+          <SearchProvider>
+            <NotificationsProvider>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </NotificationsProvider>
+          </SearchProvider>
         </MantineProvider>
       </ColorSchemeProvider>
     </>

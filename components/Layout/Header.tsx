@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSpotlight } from '@mantine/spotlight';
 import {
   Burger,
   Header,
@@ -10,9 +11,11 @@ import {
   SimpleGrid,
   Image,
   Box,
+  ActionIcon,
 } from '@mantine/core';
 import { Search, ShoppingCart, User } from 'tabler-icons-react';
 import { categoryList, SubCategoryItemProps } from './CategoryList';
+import Router from 'next/router';
 
 function CategoryHeader({
   opened,
@@ -25,6 +28,7 @@ function CategoryHeader({
   const shouldShowSubItemCategory = (categoryData: SubCategoryItemProps[]) => {
     return categoryData.some((item) => item.items.length > 0);
   };
+  const spotlight = useSpotlight();
   return (
     <>
       <MediaQuery smallerThan="md" styles={{ display: 'none' }}>
@@ -125,12 +129,15 @@ function CategoryHeader({
             <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
               <MediaQuery smallerThan="lg" styles={{ fontSize: 18, width: '120px' }}>
                 <Text
-                  sx={{ letterSpacing: '4px' }}
+                  sx={{ letterSpacing: '4px', cursor: 'pointer' }}
                   transform="uppercase"
                   size="xl"
                   weight={500}
                   align="center"
                   mr="xl"
+                  onClick={() => {
+                    Router.push('/');
+                  }}
                 >
                   Furniture Shop
                 </Text>
@@ -158,15 +165,27 @@ function CategoryHeader({
                 </Group>
               </MediaQuery>
               <Space w="md" />
-              <Search size={20} strokeWidth={1.5} />
+              <ActionIcon
+                size={32}
+                variant="hover"
+                radius={20}
+                onClick={spotlight.openSpotlight}
+                sx={{ outline: 'none' }}
+              >
+                <Search size={20} strokeWidth={1.5} />
+              </ActionIcon>
               <Space w="xl" />
               <MediaQuery smallerThan="md" styles={{ display: 'none' }}>
-                <User size={20} strokeWidth={1.5} />
+                <ActionIcon size={32} variant="hover" radius={20}>
+                  <User size={20} strokeWidth={1.5} />
+                </ActionIcon>
               </MediaQuery>
               <MediaQuery smallerThan="md" styles={{ display: 'none' }}>
                 <Space w="xl" />
               </MediaQuery>
-              <ShoppingCart size={20} strokeWidth={1.5} />
+              <ActionIcon size={32} variant="hover" radius={20}>
+                <ShoppingCart size={20} strokeWidth={1.5} />
+              </ActionIcon>
             </div>
           </div>
         </Container>

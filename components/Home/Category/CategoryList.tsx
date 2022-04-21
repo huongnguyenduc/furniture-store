@@ -4,7 +4,7 @@ import ScrollContainer from 'react-indiana-drag-scroll';
 import { useHover, useMediaQuery } from '@mantine/hooks';
 
 const CategoryList = () => {
-  const matches = useMediaQuery('(min-width: 1280px)');
+  const matches = useMediaQuery('(min-width: 1280px)', false);
   return (
     <Box py="lg" my="lg" sx={{ position: 'relative' }}>
       <ScrollContainer

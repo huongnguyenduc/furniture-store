@@ -6,7 +6,7 @@ import { ArrowNarrowRight } from 'tabler-icons-react';
 import { CollectionPage } from './CollectionData';
 
 const SeatingCollection = ({ data }: { data: CollectionPage }) => {
-  const matches = useMediaQuery('(min-width: 1280px)');
+  const matches = useMediaQuery('(min-width: 1280px)', false);
   return (
     <Box pt="xl" mt="xl">
       <Container size="xl">

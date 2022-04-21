@@ -24,7 +24,12 @@ const CustomJourneySection = () => {
             {CustomList.map((item) => (
               <Grid.Col sm={6} lg={3} key={item.title}>
                 <Group noWrap sx={{ cursor: 'pointer' }}>
-                  <ActionIcon color="green" size={48} radius={32} variant="outline">
+                  <ActionIcon
+                    sx={(theme) => ({ color: theme.colors.deepGreen })}
+                    size={48}
+                    radius={32}
+                    variant="outline"
+                  >
                     <item.icon size={32} strokeWidth={0.5} />
                   </ActionIcon>
                   <Box>
