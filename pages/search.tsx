@@ -1,28 +1,28 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import { Box, Center, Container, Grid, Text } from '@mantine/core';
+import { Box, Container, Grid } from '@mantine/core';
 import FilterList from '../components/Search/FilterList/FilterList';
 import ProductItem from '../components/ProductItem';
+import SearchTitle from '../components/Search/Title/SearchTitle';
+import Router from 'next/router';
 
 const Search = () => {
   const router = useRouter();
   const { q } = router.query;
   return (
     <Box sx={{ position: 'relative' }}>
-      <Center mt="xl">
-        <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-          <Text size="xl" sx={(theme) => ({ color: theme.colors.lightGrey })}>
-            Showing 2 results for:
-          </Text>
-          <Text size="xl" sx={(theme) => ({ color: theme.colors.lightGrey })} mt="md">
-            "{q}"
-          </Text>
-        </Box>
-      </Center>
+      <SearchTitle query={q} />
       <FilterList />
       <Container size="xl" py="lg">
         <Grid>
-          <Grid.Col xs={12} sm={6} md={4}>
+          <Grid.Col
+            xs={12}
+            sm={6}
+            md={4}
+            onClick={() => {
+              Router.push('/product');
+            }}
+          >
             <ProductItem />
           </Grid.Col>
           <Grid.Col xs={12} sm={6} md={4}>

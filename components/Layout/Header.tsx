@@ -128,19 +128,21 @@ function CategoryHeader({
             </MediaQuery>
             <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
               <MediaQuery smallerThan="lg" styles={{ fontSize: 18, width: '120px' }}>
-                <Text
-                  sx={{ letterSpacing: '4px', cursor: 'pointer' }}
-                  transform="uppercase"
-                  size="xl"
-                  weight={500}
-                  align="center"
-                  mr="xl"
-                  onClick={() => {
-                    Router.push('/');
-                  }}
-                >
-                  Furniture Shop
-                </Text>
+                <MediaQuery smallerThan="md" styles={{ marginLeft: '15%' }}>
+                  <Text
+                    sx={{ letterSpacing: '4px', cursor: 'pointer' }}
+                    transform="uppercase"
+                    size="xl"
+                    weight={500}
+                    align="center"
+                    mr="xl"
+                    onClick={() => {
+                      Router.push('/');
+                    }}
+                  >
+                    Furniture Shop
+                  </Text>
+                </MediaQuery>
               </MediaQuery>
               <MediaQuery smallerThan="md" styles={{ display: 'none' }}>
                 <Group>

@@ -7,6 +7,7 @@ import ImageSlider from './ImageSlider';
 const DifferenceSection = () => {
   const [category, setCategory] = React.useState<CategoryItem>(categoryData[0]);
   const matches = useMediaQuery('(max-width: 1070px)');
+  const matchesSmall = useMediaQuery('(min-width: 430px)');
   return (
     <Box my="lg" sx={(theme) => ({ backgroundColor: theme.colors.lightGreen })}>
       <Container py={72} size="xl">
@@ -35,10 +36,19 @@ const DifferenceSection = () => {
                   : { marginRight: 16 }
               }
             >
-              <Text size="lg" sx={(theme) => ({ color: theme.colors.lightGrey })} mb="xl">
+              <Text
+                size={matchesSmall ? 'lg' : 'md'}
+                sx={(theme) => ({ color: theme.colors.lightGrey })}
+                mb="xl"
+              >
                 THE ID DIFFERENCE
               </Text>
-              <Text sx={(theme) => ({ color: theme.colors.lightGrey, fontSize: 36 })}>
+              <Text
+                sx={(theme) => ({
+                  color: theme.colors.lightGrey,
+                  fontSize: matchesSmall ? 36 : 28,
+                })}
+              >
                 custom made, not pre-made
               </Text>
             </Box>

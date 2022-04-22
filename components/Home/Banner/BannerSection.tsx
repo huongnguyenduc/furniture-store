@@ -1,6 +1,8 @@
 import { Container, Text, Box, Button, MediaQuery } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 
 const BannerSection = () => {
+  const matches = useMediaQuery('(min-width: 430px)');
   return (
     <Container size={1440} px={0}>
       <Box
@@ -21,7 +23,7 @@ const BannerSection = () => {
             backgroundImage: 'linear-gradient(rgba(255,255,255,1), rgba(255,255,255,0.05))',
           }}
         >
-          <Box mb="xl" p={48}>
+          <Box mb="xl" p={matches ? 48 : 24}>
             <Text
               mb="xl"
               weight="normal"
@@ -29,11 +31,14 @@ const BannerSection = () => {
             >
               15% OFF
             </Text>
-            <Text mb="xl" sx={(theme) => ({ color: theme.colors.deepBlue, fontSize: 64 })}>
+            <Text
+              mb="xl"
+              sx={(theme) => ({ color: theme.colors.deepBlue, fontSize: matches ? 64 : 48 })}
+            >
               seeing spring
             </Text>
             <Text size="md" weight={300} sx={(theme) => ({ color: theme.colors.deepBlue })}>
-              Customize in full bloom. 15% off ends 4/18.
+              Customize in full bloom. 15% off ends 22/4.
             </Text>
           </Box>
         </MediaQuery>

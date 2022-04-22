@@ -19,6 +19,7 @@ export const theme: MantineThemeOverride = {
     mediumBorder: ['#C6BBB3'],
     hoverBackground: ['#F8F8F8'],
     selectedBackground: ['#F2ECE5'],
+    brownBackground: ['#AFA196'],
   },
   primaryColor: 'brand',
   fontFamily: 'Calibre, sans serif',
@@ -43,11 +44,11 @@ export const theme: MantineThemeOverride = {
     },
   },
   radius: {
-    xs: 0,
-    sm: 0,
-    md: 0,
-    lg: 0,
-    xl: 0,
+    xs: 4,
+    sm: 8,
+    md: 12,
+    lg: 16,
+    xl: 24,
   },
   other: {
     defaultText: {
