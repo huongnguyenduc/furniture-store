@@ -4,7 +4,7 @@ import { CategoryItem } from './CategoryData';
 import { useMediaQuery, useViewportSize } from '@mantine/hooks';
 
 const ImageSlider = ({ data }: { data: CategoryItem }) => {
-  const matches = useMediaQuery('(max-width: 1070px)');
+  const matches = useMediaQuery('(max-width: 1070px)', false);
   const { width } = useViewportSize();
   return (
     <>

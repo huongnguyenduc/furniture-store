@@ -6,8 +6,8 @@ import ImageSlider from './ImageSlider';
 
 const DifferenceSection = () => {
   const [category, setCategory] = React.useState<CategoryItem>(categoryData[0]);
-  const matches = useMediaQuery('(max-width: 1070px)');
-  const matchesSmall = useMediaQuery('(min-width: 430px)');
+  const matches = useMediaQuery('(max-width: 1070px)', false);
+  const matchesSmall = useMediaQuery('(min-width: 430px)', false);
   return (
     <Box my="lg" sx={(theme) => ({ backgroundColor: theme.colors.lightGreen })}>
       <Container py={72} size="xl">

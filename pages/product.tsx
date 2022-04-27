@@ -154,7 +154,7 @@ const useStyles = createStyles((theme, _params) => ({
 
 const Product = () => {
   const { classes } = useStyles();
-  const matches = useMediaQuery('(min-width: 992px)');
+  const matches = useMediaQuery('(min-width: 992px)', false);
   return (
     <>
       <Container size="xl">

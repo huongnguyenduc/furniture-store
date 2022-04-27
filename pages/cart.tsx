@@ -2,16 +2,13 @@ import {
   Text,
   Box,
   Container,
-  Image,
   Accordion,
   Button,
   Group,
-  SimpleGrid,
   TextInput,
   MediaQuery,
 } from '@mantine/core';
 import { createStyles } from '@mantine/core';
-import AccordionLabel from '../components/DetailProduct/AccordionLabel';
 import { useMediaQuery } from '@mantine/hooks';
 import CartItem from '../components/Cart/CartItem';
 import { ArrowNarrowRight } from 'tabler-icons-react';
@@ -157,7 +154,7 @@ const useStyles = createStyles((theme, _params) => ({
 
 const ShoppingCart = () => {
   const { classes } = useStyles();
-  const matches = useMediaQuery('(min-width: 992px)');
+  const matches = useMediaQuery('(min-width: 992px)', false);
   return (
     <>
       <Container size={1280}>

@@ -367,6 +367,11 @@
   "resolved" "https://registry.npmjs.org/@mantine/dates/-/dates-4.1.4.tgz"
   "version" "4.1.4"
 
+"@mantine/form@^4.1.5":
+  "integrity" "sha512-9Dl9pe4KD+qGi0qHms8VssvUMjLLhmJV3AQGm9C3PmiH8Cm+S9x6oHKD3grNbnSQLOsTymWKW9/kxvfU1BMeBg=="
+  "resolved" "https://registry.npmjs.org/@mantine/form/-/form-4.1.5.tgz"
+  "version" "4.1.5"
+
 "@mantine/hooks@4.1.4":
   "integrity" "sha512-1pcajF7gaSY0sUp9klqt7Y/gPIfTnHamkuefd8UctHMNBP25QdValAT1XGYfmHKIXeljZi7ow6O6dhsK9C8X2A=="
   "resolved" "https://registry.npmjs.org/@mantine/hooks/-/hooks-4.1.4.tgz"

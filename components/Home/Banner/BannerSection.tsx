@@ -2,7 +2,7 @@ import { Container, Text, Box, Button, MediaQuery } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 
 const BannerSection = () => {
-  const matches = useMediaQuery('(min-width: 430px)');
+  const matches = useMediaQuery('(min-width: 430px)', false);
   return (
     <Container size={1440} px={0}>
       <Box

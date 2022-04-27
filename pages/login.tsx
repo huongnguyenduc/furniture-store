@@ -12,11 +12,12 @@ import {
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import Link from 'next/link';
+import Router from 'next/router';
 import React from 'react';
 
 const Login = () => {
-  const matchMd = useMediaQuery('(min-width: 992px)');
-  const matchSm = useMediaQuery('(min-width: 768px)');
+  const matchMd = useMediaQuery('(min-width: 992px)', false);
+  const matchSm = useMediaQuery('(min-width: 768px)', false);
   return (
     <Container size="lg" py={72} px={0}>
       <Box>
@@ -45,18 +46,7 @@ const Login = () => {
               >
                 Check your order status, update your billing info, and review past purchases.
               </Text>
-              <TextInput
-                styles={(theme) => ({
-                  label: {
-                    color: theme.colors.lightGrey,
-                    lineHeight: 1.35,
-                    letterSpacing: '0.023em',
-                    fontWeight: 400,
-                  },
-                })}
-                label="Email Address"
-                size="md"
-              />
+              <TextInput label="Email Address" size="md" />
               <PasswordInput
                 styles={(theme) => ({
                   label: {
@@ -173,6 +163,9 @@ const Login = () => {
                         borderColor: '#aaa',
                       },
                     })}
+                    onClick={() => {
+                      Router.push('/signup');
+                    }}
                   >
                     Create an account
                   </Box>

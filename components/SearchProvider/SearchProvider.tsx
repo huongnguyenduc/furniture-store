@@ -81,7 +81,7 @@ export function SearchProvider({ children }: { children: ReactNode }) {
         actions.filter((action) => action.title.toLowerCase().includes(query.toLowerCase()))
       }
       highlightQuery
-      radius="xl"
+      radius="md"
       limit={5}
     >
       {children}

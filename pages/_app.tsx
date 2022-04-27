@@ -9,8 +9,20 @@ import { Calibre } from '../assets/fonts/Calibre/Calibre';
 import { theme } from '../config/theme';
 import Layout from '../components/Layout/Layout';
 import { SearchProvider } from '../components/SearchProvider/SearchProvider';
+import { styles } from '../config/styles';
 
-export default function App(props: AppProps & { colorScheme: ColorScheme }) {
+import type { ReactElement, ReactNode } from 'react';
+import type { NextPage } from 'next';
+
+type NextPageWithLayout = NextPage & {
+  getLayout?: (page: ReactElement) => ReactNode;
+};
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout;
+};
+
+export default function App(props: AppPropsWithLayout & { colorScheme: ColorScheme }) {
   const { Component, pageProps } = props;
   const [colorScheme, setColorScheme] = useState<ColorScheme>(props.colorScheme);
 
@@ -19,6 +31,8 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
     setColorScheme(nextColorScheme);
     setCookies('mantine-color-scheme', nextColorScheme, { maxAge: 60 * 60 * 24 * 30 });
   };
+
+  const getLayout = Component.getLayout ?? ((page) => page);
 
   return (
     <>
@@ -29,15 +43,18 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
       </Head>
       <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
         <Calibre />
-        <MantineProvider theme={{ ...theme, colorScheme }} withGlobalStyles withNormalizeCSS>
-          <SearchProvider>
+        <SearchProvider>
+          <MantineProvider
+            theme={{ ...theme, colorScheme }}
+            styles={styles}
+            withGlobalStyles
+            withNormalizeCSS
+          >
             <NotificationsProvider>
-              <Layout>
-                <Component {...pageProps} />
-              </Layout>
+              <Layout>{getLayout(<Component {...pageProps} />)}</Layout>
             </NotificationsProvider>
-          </SearchProvider>
-        </MantineProvider>
+          </MantineProvider>
+        </SearchProvider>
       </ColorSchemeProvider>
     </>
   );

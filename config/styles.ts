@@ -1,18 +1,32 @@
 import { MantineTheme } from '@mantine/core';
 
 export const styles = {
-  Breadcrumbs: (theme: MantineTheme) => ({
-    root: {
-      '& .mantine-Anchor-root': {
-        color: `${theme.colors.dark[9]}`,
-        fontSize: `${theme.fontSizes.sm}px`,
-        fontWeight: '300 !important',
+  TextInput: (theme: MantineTheme) => ({
+    input: {
+      transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
+      '&:focus': {
+        boxShadow: `inset 0 0 0 1px ${theme.colors.lightGrey}`,
       },
-      '& .mantine-Text-root': {
-        color: `${theme.colors.dark[9]}`,
-        fontSize: `${theme.fontSizes.sm}px`,
-        fontWeight: '500',
+    },
+    label: {
+      color: theme.colors.lightGrey,
+      lineHeight: 1.35,
+      letterSpacing: '0.023em',
+      fontWeight: 400,
+    },
+  }),
+  PasswordInput: (theme: MantineTheme) => ({
+    input: {
+      transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
+      '&:focus': {
+        boxShadow: `inset 0 0 0 1px ${theme.colors.lightGrey}`,
       },
+    },
+    label: {
+      color: theme.colors.lightGrey,
+      lineHeight: 1.35,
+      letterSpacing: '0.023em',
+      fontWeight: 400,
     },
   }),
 };
