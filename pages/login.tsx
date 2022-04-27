@@ -1,14 +1,20 @@
 import { Anchor, Box, Button, Container, Grid, Image, List, Text, TextInput } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import Link from 'next/link';
 import React from 'react';
 
 const Login = () => {
+  const matchMd = useMediaQuery('(min-width: 992px)');
+  const matchSm = useMediaQuery('(min-width: 768px)');
   return (
-    <Container size="lg" py={72}>
+    <Container size="lg" py={72} px={0}>
       <Box>
         <Grid justify="center" align="center">
           <Grid.Col sm={4}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: '36px' }}>
+            <Box
+              sx={{ display: 'flex', flexDirection: 'column', gap: '36px' }}
+              px={matchSm ? 0 : 24}
+            >
               <Text
                 sx={(theme) => ({
                   color: theme.colors.brownBackground,
@@ -91,7 +97,13 @@ const Login = () => {
           </Grid.Col>
           <Grid.Col sm={1} />
           <Grid.Col sm={6}>
-            <Box sx={{ background: 'rgba(242, 236, 229, 0.3)', padding: '3.7em 60px' }}>
+            <Box
+              sx={{
+                background: 'rgba(242, 236, 229, 0.3)',
+                padding: matchMd ? '3.7em 60px' : '1.5em 20px',
+                borderRadius: '10px',
+              }}
+            >
               <Text
                 sx={(theme) => ({
                   color: theme.colors.lightGrey,
