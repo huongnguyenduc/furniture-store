@@ -1,4 +1,15 @@
-import { Anchor, Box, Button, Container, Grid, Image, List, Text, TextInput } from '@mantine/core';
+import {
+  Anchor,
+  Box,
+  Button,
+  Container,
+  Grid,
+  Image,
+  List,
+  PasswordInput,
+  Text,
+  TextInput,
+} from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import Link from 'next/link';
 import React from 'react';
@@ -46,7 +57,7 @@ const Login = () => {
                 label="Email Address"
                 size="md"
               />
-              <TextInput
+              <PasswordInput
                 styles={(theme) => ({
                   label: {
                     color: theme.colors.lightGrey,
