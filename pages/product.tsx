@@ -142,7 +142,7 @@ const useStyles = createStyles((theme, _params) => ({
     background: 'linear-gradient(to top, #F8F8F8 40px, transparent 40px)',
     [`@media (min-width: ${theme.breakpoints.lg}px)`]: {
       // Type safe child reference in nested selectors via ref
-      background: 'linear-gradient(to left, rgba(242, 236, 229, 0.3) 510px, transparent 510px)',
+      background: 'linear-gradient(to left, rgba(243, 236, 229, 0.3) 510px, transparent 510px)',
     },
     [`@media (min-width: ${theme.breakpoints.md}px)`]: {
       padding: '0 20px',

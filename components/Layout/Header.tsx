@@ -83,7 +83,7 @@ function CategoryHeader({
                           transition: 'transform 400ms cubic-bezier(0.4, 0, 0.2, 1)',
                           cursor: 'pointer',
                         }}
-                        key={item}
+                        key={`${item}-header`}
                       >
                         {item}
                       </Text>
@@ -160,12 +160,6 @@ function CategoryHeader({
               </MediaQuery>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-              <MediaQuery smallerThan="md" styles={{ display: 'none' }}>
-                <Group position="right">
-                  <Text pr="md">Free Swatches</Text>
-                  <Text pr="md">Locations</Text>
-                </Group>
-              </MediaQuery>
               <Space w="md" />
               <ActionIcon
                 size={32}
@@ -178,14 +172,28 @@ function CategoryHeader({
               </ActionIcon>
               <Space w="xl" />
               <MediaQuery smallerThan="md" styles={{ display: 'none' }}>
-                <ActionIcon size={32} variant="hover" radius={20}>
+                <ActionIcon
+                  size={32}
+                  variant="hover"
+                  radius={20}
+                  onClick={() => {
+                    Router.push('/login');
+                  }}
+                >
                   <User size={20} strokeWidth={1.5} />
                 </ActionIcon>
               </MediaQuery>
               <MediaQuery smallerThan="md" styles={{ display: 'none' }}>
                 <Space w="xl" />
               </MediaQuery>
-              <ActionIcon size={32} variant="hover" radius={20}>
+              <ActionIcon
+                size={32}
+                variant="hover"
+                radius={20}
+                onClick={() => {
+                  Router.push('/cart');
+                }}
+              >
                 <ShoppingCart size={20} strokeWidth={1.5} />
               </ActionIcon>
             </div>
