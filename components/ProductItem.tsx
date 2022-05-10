@@ -1,6 +1,7 @@
 import { Box, Image, Text } from '@mantine/core';
 import React from 'react';
 import { createStyles } from '@mantine/core';
+import Router from 'next/router';
 
 const useStyles = createStyles((theme, _params) => ({
   productItem: {
@@ -12,27 +13,42 @@ const useStyles = createStyles((theme, _params) => ({
     '&:hover': {
       boxShadow: '0 0 2px 0.5px rgb(21 21 21 / 5%), 0 1px 5px 0 rgb(21 21 21 / 15%)',
     },
-    // Dynamic media queries, define breakpoints in theme, use anywhere
   },
 }));
 
-const ProductItem = () => {
+interface ProductItem {
+  image: string;
+  productId: number;
+  productName: string;
+  brandName: string;
+  variants: { price: number }[];
+}
+
+const ProductItem = ({ data }: { data: ProductItem }) => {
   const { classes } = useStyles();
+  if (data.variants.length === 0) return <></>;
   return (
-    <Box className={classes.productItem}>
-      <Image
-        alt="image"
-        src="https://media.interiordefine.com/media/catalog/product/cache/1/small_image/367x252/d1eeb9ab675959a226cfd51daf82850d/a/l/alxr.leathr.char.accent.jpg"
-      />
+    <Box
+      className={classes.productItem}
+      onClick={() => {
+        Router.push(`/product?id=${data.productId}`);
+      }}
+    >
+      <Image alt="image" src={data.image} />
       <Text sx={(theme) => ({ color: theme.colors.lightGrey, letterSpacing: 0.5 })} mt="sm">
-        Alexander Leather Accent Chair Leather
+        {data.brandName} · {data.productName}
       </Text>
       <Text sx={(theme) => ({ color: theme.colors.lightGrey, letterSpacing: 0.5 })} mt="sm">
-        From $1592
+        From $
+        {
+          data.variants?.reduce((prev, cur) => (prev.price > cur.price ? cur : prev), {
+            price: 9999999,
+          }).price
+        }
       </Text>
-      <Text sx={(theme) => ({ color: '#aaa', letterSpacing: 0.5 })} mt="sm">
+      {/* <Text sx={(theme) => ({ color: '#aaa', letterSpacing: 0.5 })} mt="sm">
         20+ legs
-      </Text>
+      </Text> */}
     </Box>
   );
 };

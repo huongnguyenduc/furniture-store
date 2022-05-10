@@ -34,6 +34,7 @@ const AccountMenu = () => {
           })}
           className={classes.menuListItem}
           onClick={() => router.push(item.link)}
+          key={item.title}
         >
           {item.title}
         </Text>

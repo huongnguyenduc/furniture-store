@@ -10,9 +10,11 @@ import { theme } from '../config/theme';
 import Layout from '../components/Layout/Layout';
 import { SearchProvider } from '../components/SearchProvider/SearchProvider';
 import { styles } from '../config/styles';
-
 import type { ReactElement, ReactNode } from 'react';
 import type { NextPage } from 'next';
+import { SWRConfig } from 'swr';
+import { axiosFetcher } from '../utils/fetcher';
+import { SessionProvider } from 'next-auth/react';
 
 type NextPageWithLayout = NextPage & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -41,21 +43,25 @@ export default function App(props: AppPropsWithLayout & { colorScheme: ColorSche
         <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
         <link rel="shortcut icon" href="/favicon.svg" />
       </Head>
-      <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
-        <Calibre />
-        <SearchProvider>
-          <MantineProvider
-            theme={{ ...theme, colorScheme }}
-            styles={styles}
-            withGlobalStyles
-            withNormalizeCSS
-          >
-            <NotificationsProvider>
-              <Layout>{getLayout(<Component {...pageProps} />)}</Layout>
-            </NotificationsProvider>
-          </MantineProvider>
-        </SearchProvider>
-      </ColorSchemeProvider>
+      <SessionProvider>
+        <SWRConfig value={{ fetcher: axiosFetcher }}>
+          <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
+            <Calibre />
+            <SearchProvider>
+              <MantineProvider
+                theme={{ ...theme, colorScheme }}
+                styles={styles}
+                withGlobalStyles
+                withNormalizeCSS
+              >
+                <NotificationsProvider>
+                  <Layout>{getLayout(<Component {...pageProps} />)}</Layout>
+                </NotificationsProvider>
+              </MantineProvider>
+            </SearchProvider>
+          </ColorSchemeProvider>
+        </SWRConfig>
+      </SessionProvider>
     </>
   );
 }

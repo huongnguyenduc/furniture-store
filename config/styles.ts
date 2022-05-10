@@ -16,10 +16,23 @@ export const styles = {
     },
   }),
   PasswordInput: (theme: MantineTheme) => ({
-    input: {
+    defaultVariant: {
       transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
       '&:focus': {
-        boxShadow: `inset 0 0 0 1px ${theme.colors.lightGrey}`,
+        borderColor: `${theme.colors.lightGrey}`,
+        // outline: 'none',
+      },
+    },
+    input: {
+      '&:focus': {
+        // outline: 0,
+        borderColor: `${theme.colors.lightGrey}`,
+      },
+    },
+    innerInput: {
+      '&:focus': {
+        // outline: 0,
+        borderColor: `${theme.colors.lightGrey}`,
       },
     },
     label: {

@@ -4,6 +4,10 @@ import { ChevronRight, ShoppingCart } from 'tabler-icons-react';
 import { createStyles } from '@mantine/core';
 import AccordionLabel from '../components/DetailProduct/AccordionLabel';
 import { useMediaQuery } from '@mantine/hooks';
+import { useRouter } from 'next/router';
+import useSWR from 'swr';
+import { fetcher } from '../utils/fetcher';
+import ScrollContainer from 'react-indiana-drag-scroll';
 
 const useStyles = createStyles((theme, _params) => ({
   breadcrumbsContainer: {
@@ -152,9 +156,50 @@ const useStyles = createStyles((theme, _params) => ({
   },
 }));
 
+interface Option {
+  optionId: number;
+  optionName: string;
+  optionValue: string;
+  optionImage: string;
+}
+interface Variant {
+  price: number;
+  sku: string;
+  options: Option[];
+}
+interface Product {
+  brandId: number;
+  brandName: string;
+  categoryId: number;
+  categoryName: string;
+  image: string;
+  productDesc: string;
+  productId: number;
+  productName: string;
+  variants: Variant[];
+}
+
+interface ProductResponse {
+  content: Product;
+  error: string;
+  status: number;
+  timestamp: string;
+}
+
 const Product = () => {
   const { classes } = useStyles();
   const matches = useMediaQuery('(min-width: 992px)', false);
+  const router = useRouter();
+  const { id } = router.query;
+  const { data: jwt } = useSWR('/api/auth/getToken', fetcher);
+  const { data, error } = useSWR<ProductResponse>(() => [
+    `products/${id}`,
+    'GET',
+    {},
+    jwt.accessToken,
+  ]);
+  console.log(data);
+  const isLoadingInitialData = !data && !error;
   return (
     <>
       <Container size="xl">
@@ -169,7 +214,9 @@ const Product = () => {
               </Text>
             </Link>
             <Link href="#" passHref>
-              <Text sx={(theme) => ({ color: theme.colors.lightGrey })}>Sofa</Text>
+              <Text sx={(theme) => ({ color: theme.colors.lightGrey })}>
+                {data?.content.categoryName}
+              </Text>
             </Link>
           </Breadcrumbs>
         </Box>
@@ -177,22 +224,19 @@ const Product = () => {
       <Box className={`${classes.productContainer} ${classes.productContainerTop}`}>
         <Box className={classes.productRow}>
           <Box className={classes.productTitleMobile}>
-            <Text size="xl">Alexander Accent Chair</Text>
+            <Text size="xl">{data?.content.productName}</Text>
             <Text size="xl" sx={(theme) => ({ color: theme.colors.lightGrey })} mt="lg">
-              $1595
+              ${data?.content.variants[0].price}
             </Text>
           </Box>
           <Box className={`${classes.productImage} ${classes.productCol}`}>
-            <Image
-              alt="image"
-              src="https://content.cylindo.com/api/v2/4472/products/ALXR.LEATHR.CHAR.ACCENT/frames/1/ALXR.LEATHR.CHAR.ACCENT.JPG?background=FFFFFF&feature=COLOR:LTHR-02&feature=FINISH:LEG005-3"
-            />
+            <Image alt="image" src={data?.content.image} />
           </Box>
           <Box className={classes.productColCart}>
             <Box className={classes.productTitle} pt="xl" mt="xl">
-              <Text size="xl">Alexander Accent Chair</Text>
+              <Text size="xl">{data?.content.productName}</Text>
               <Text size="xl" sx={(theme) => ({ color: theme.colors.lightGrey })} mt="lg">
-                $1595
+                ${data?.content.variants[0].price}
               </Text>
             </Box>
             <Accordion
@@ -204,18 +248,109 @@ const Product = () => {
               })}
             >
               <Accordion.Item label={<AccordionLabel index={1} title="Choose Fabric" />}>
-                Colors, fonts, shadows and many other parts are customizable to fit your design
-                needs
+                <ScrollContainer
+                  style={{
+                    height: 100,
+                    display: 'flex',
+                  }}
+                >
+                  {data?.content.variants.map((item) => {
+                    return (
+                      <Box
+                        sx={(theme) => ({
+                          userSelect: 'none',
+                          cursor: 'pointer',
+                          minWidth: '100px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                        })}
+                        key={
+                          item.options[item.options[0].optionName === 'Chất liệu' ? 0 : 1]
+                            .optionValue
+                        }
+                      >
+                        <Box
+                          sx={{
+                            transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
+                          }}
+                        >
+                          <Image
+                            src={
+                              item.options[item.options[0].optionName === 'Chất liệu' ? 0 : 1]
+                                .optionImage
+                            }
+                            height={75}
+                            alt={
+                              item.options[item.options[0].optionName === 'Chất liệu' ? 0 : 1]
+                                .optionValue
+                            }
+                            mb="sm"
+                          />
+                        </Box>
+                        <Text>
+                          {
+                            item.options[item.options[0].optionName === 'Chất liệu' ? 0 : 1]
+                              .optionValue
+                          }
+                        </Text>
+                      </Box>
+                    );
+                  })}
+                </ScrollContainer>
               </Accordion.Item>
 
               <Accordion.Item label={<AccordionLabel index={2} title="Choose Legs" />}>
-                Configure components appearance and behavior with vast amount of settings or
-                overwrite any part of component styles
-              </Accordion.Item>
-
-              <Accordion.Item label={<AccordionLabel index={3} title="Choose Quantity" />}>
-                With new :focus-visible pseudo-class focus ring appears only when user navigates
-                with keyboard
+                <ScrollContainer
+                  style={{
+                    height: 100,
+                    display: 'flex',
+                  }}
+                >
+                  {data?.content.variants.map((item) => {
+                    return (
+                      <Box
+                        sx={(theme) => ({
+                          userSelect: 'none',
+                          cursor: 'pointer',
+                          minWidth: '100px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                        })}
+                        key={
+                          item.options[item.options[0].optionName === 'Chất liệu chân' ? 0 : 1]
+                            .optionValue
+                        }
+                      >
+                        <Box
+                          sx={{
+                            transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
+                          }}
+                        >
+                          <Image
+                            src={
+                              item.options[item.options[0].optionName === 'Chất liệu chân' ? 0 : 1]
+                                .optionImage
+                            }
+                            height={75}
+                            alt={
+                              item.options[item.options[0].optionName === 'Chất liệu chân' ? 0 : 1]
+                                .optionValue
+                            }
+                            mb="sm"
+                          />
+                        </Box>
+                        <Text>
+                          {
+                            item.options[item.options[0].optionName === 'Chất liệu chân' ? 0 : 1]
+                              .optionValue
+                          }
+                        </Text>
+                      </Box>
+                    );
+                  })}
+                </ScrollContainer>
               </Accordion.Item>
             </Accordion>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} mt="xl">
@@ -231,7 +366,7 @@ const Product = () => {
               >
                 <Group position="apart" align="center">
                   <Text size="xl" mt={8}>
-                    $1595
+                    ${data?.content.variants[0].price}
                   </Text>
                   <Box
                     sx={{
@@ -255,24 +390,9 @@ const Product = () => {
             </Box>
           </Box>
           <Box className={`${classes.productDetail} ${classes.productCol}`}>
-            <Accordion iconPosition="right" multiple>
-              <Accordion.Item label="Product Description">
-                A traditionally-inspired silhouette that automatically feels timeless. With a higher
-                back and elevated arms, Alexander is a sofa that looks refined while feeling
-                supremely comfortable. With subtle details like delicately pleated English rolled
-                arms and elegant piping along its frame and seat and back cushions, Alexander
-                marries classic design with a minimalist sensibility. Charming caster legs are
-                higher in the front for a more cozy seating experience, inviting you to sit back and
-                sink in.
-              </Accordion.Item>
-              <Accordion.Item label="Product Description">
-                A traditionally-inspired silhouette that automatically feels timeless. With a higher
-                back and elevated arms, Alexander is a sofa that looks refined while feeling
-                supremely comfortable. With subtle details like delicately pleated English rolled
-                arms and elegant piping along its frame and seat and back cushions, Alexander
-                marries classic design with a minimalist sensibility. Charming caster legs are
-                higher in the front for a more cozy seating experience, inviting you to sit back and
-                sink in.
+            <Accordion iconPosition="right">
+              <Accordion.Item label="Product Description" opened>
+                {data?.content.productDesc}
               </Accordion.Item>
             </Accordion>
           </Box>

@@ -61,43 +61,11 @@ const SignUp = () => {
           style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}
           autoComplete="off"
         >
-          <TextInput
-            label="First Name"
-            styles={(theme) => ({
-              label: {
-                color: theme.colors.lightGrey,
-                lineHeight: 1.35,
-                letterSpacing: '0.023em',
-                fontWeight: 400,
-              },
-            })}
-            size="md"
-            {...form.getInputProps('firstName')}
-          />
-          <TextInput
-            label="Last Name"
-            styles={(theme) => ({
-              label: {
-                color: theme.colors.lightGrey,
-                lineHeight: 1.35,
-                letterSpacing: '0.023em',
-                fontWeight: 400,
-              },
-            })}
-            size="md"
-            {...form.getInputProps('lastName')}
-          />
+          <TextInput label="First Name" size="md" {...form.getInputProps('firstName')} />
+          <TextInput label="Last Name" size="md" {...form.getInputProps('lastName')} />
           <TextInput
             label="Email Address"
             autoComplete="off"
-            styles={(theme) => ({
-              label: {
-                color: theme.colors.lightGrey,
-                lineHeight: 1.35,
-                letterSpacing: '0.023em',
-                fontWeight: 400,
-              },
-            })}
             size="md"
             {...form.getInputProps('email')}
           />

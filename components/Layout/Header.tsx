@@ -177,7 +177,7 @@ function CategoryHeader({
                   variant="hover"
                   radius={20}
                   onClick={() => {
-                    Router.push('/login');
+                    Router.push('/account/edit');
                   }}
                 >
                   <User size={20} strokeWidth={1.5} />
