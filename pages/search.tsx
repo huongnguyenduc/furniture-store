@@ -8,6 +8,7 @@ import SearchTitle from '../components/Search/Title/SearchTitle';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import { fetcher } from '../utils/fetcher';
+import { useSession } from 'next-auth/react';
 
 const PAGE_SIZE = 6;
 
@@ -22,12 +23,12 @@ interface SearchPage {
 const Search = () => {
   const router = useRouter();
   const { q } = router.query;
-  const { data: jwt } = useSWR('/api/auth/getToken', fetcher);
+  const { data: session } = useSession();
   const { data, error, size, setSize } = useSWRInfinite<SearchPage>((index) => [
     `products/search?name=${q}&page=${index}&size=${PAGE_SIZE}`,
     'GET',
     {},
-    jwt.accessToken,
+    session?.accessToken,
   ]);
 
   const products = data ? [].concat(...data.map((page) => page.content?.content)) : [];
@@ -53,7 +54,7 @@ const Search = () => {
               ))}
         </Grid>
         <Button onClick={() => setSize(size + 1)} loading={isLoadingMore} disabled={isReachingEnd}>
-          {isReachingEnd ? 'no more issues' : 'load more'}
+          {isReachingEnd ? 'no more product' : 'load more'}
         </Button>
       </Container>
     </Box>
