@@ -9,6 +9,7 @@ import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
 import { fetcher } from '../utils/fetcher';
 import { useSession } from 'next-auth/react';
+import SortList from '../components/Search/SortList/SortList';
 
 const PAGE_SIZE = 6;
 
@@ -20,12 +21,32 @@ interface SearchPage {
   length: number;
 }
 
+export enum SortValue {
+  ProductId = 'productId',
+  ProductName = 'productName',
+  Category = 'category',
+  Brand = 'brand',
+}
+
+export enum SortDirection {
+  Up = 'ASC',
+  Down = 'DESC',
+}
+
 const Search = () => {
   const router = useRouter();
   const { q } = router.query;
   const { data: session } = useSession();
+  const [sortValue, setSortValue] = React.useState<SortValue>(SortValue.ProductId);
+  const [sortDirection, setSortDirection] = React.useState<SortDirection>(SortDirection.Up);
+  const [brandIdList, setBrandIdList] = React.useState<number[]>([]);
+  const brandListUrl =
+    brandIdList.length === 0 ? '' : brandIdList.map((id) => `&brandId=${id}`).join('');
+  const [categoryIdList, setCategoryIdList] = React.useState<number[]>([]);
+  const categoryListUrl =
+    categoryIdList.length === 0 ? '' : categoryIdList.map((id) => `&categoryId=${id}`).join('');
   const { data, error, size, setSize } = useSWRInfinite<SearchPage>((index) => [
-    `products/search?name=${q}&page=${index}&size=${PAGE_SIZE}`,
+    `products/search?productName=${q}&pageNumber=${index}&pageSize=${PAGE_SIZE}&sortBy=${sortValue}&sortDirection=${sortDirection}${categoryListUrl}${brandListUrl}`,
     'GET',
     {},
     session?.accessToken,
@@ -42,7 +63,14 @@ const Search = () => {
   return (
     <Box sx={{ position: 'relative' }}>
       <SearchTitle productCount={data ? data[0].content.totalElements : 0} query={q} />
-      <FilterList />
+      <FilterList selectedCategoryId={categoryIdList} setSelectedCategoryId={setCategoryIdList} />
+      <SortList
+        selectedBrandId={brandIdList}
+        setSelectedBrandId={setBrandIdList}
+        setSortValue={setSortValue}
+        sortDirection={sortDirection}
+        setSortDirection={setSortDirection}
+      />
       <Container size="xl" py="lg">
         <Grid>
           {isLoadingInitialData

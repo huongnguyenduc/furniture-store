@@ -15,7 +15,6 @@ import AccordionLabel from '../components/DetailProduct/AccordionLabel';
 import { useMediaQuery } from '@mantine/hooks';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
-import { fetcher } from '../utils/fetcher';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import OptionItem from '../components/DetailProduct/OptionItem';
 import React from 'react';

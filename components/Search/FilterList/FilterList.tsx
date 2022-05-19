@@ -1,9 +1,37 @@
 import { Box, Text } from '@mantine/core';
-import { filterData } from './FilterData';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import { useMediaQuery } from '@mantine/hooks';
+import Product from '../../../pages/product';
+import useSWR from 'swr';
+import { useSession } from 'next-auth/react';
 
-const FilterList = () => {
+interface CategoryData {
+  categoryId: number;
+  categoryName: string;
+  categoryDesc: string;
+  product: Product[];
+}
+interface CategoryListResponse {
+  content: CategoryData[];
+  error: string;
+  status: number;
+  timestamp: string;
+}
+
+const FilterList = ({
+  selectedCategoryId,
+  setSelectedCategoryId,
+}: {
+  selectedCategoryId: number[];
+  setSelectedCategoryId: React.Dispatch<React.SetStateAction<number[]>>;
+}) => {
+  const { data: session } = useSession();
+  const { data, error } = useSWR<CategoryListResponse>(() => [
+    `categories?onlyActive=true`,
+    'GET',
+    {},
+    session?.accessToken,
+  ]);
   const matches = useMediaQuery('(min-width: 1280px)', false);
   return (
     <Box py="sm" my="sm" sx={{ top: 70, zIndex: 3, position: 'sticky', backgroundColor: 'white' }}>
@@ -13,13 +41,19 @@ const FilterList = () => {
           display: 'flex',
         }}
       >
-        {filterData.map((item, index) => {
+        {data?.content?.map((item, index) => {
+          const isItemSelected = selectedCategoryId.some((id) => id === item.categoryId);
           return (
             <Box
               p="md"
+              onClick={() => {
+                isItemSelected
+                  ? setSelectedCategoryId(selectedCategoryId.filter((id) => id !== item.categoryId))
+                  : setSelectedCategoryId([...selectedCategoryId, item.categoryId]);
+              }}
               sx={(theme) => ({
                 transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
-                backgroundColor: item.selected ? theme.colors.selectedBackground : theme.white,
+                backgroundColor: isItemSelected ? theme.colors.selectedBackground : theme.white,
                 userSelect: 'none',
                 cursor: 'pointer',
                 minWidth: '140px',
@@ -29,27 +63,27 @@ const FilterList = () => {
                 justifyContent: 'center',
                 outline: 'none',
                 borderRadius: 10,
-                border: `${item.selected ? 2 : 1}px solid ${
-                  item.selected ? theme.colors.mediumBorder : theme.colors.lightBorder
+                border: `${isItemSelected ? 2 : 1}px solid ${
+                  isItemSelected ? theme.colors.mediumBorder : theme.colors.lightBorder
                 }`,
                 marginLeft:
                   index == 0 && matches ? 'calc((100vw - 1280px) / 2)' : index == 0 ? 16 : 0,
                 marginRight:
-                  index == filterData.length - 1 && matches ? 'calc((100vw - 1280px) / 2)' : 16,
+                  index == data.content.length - 1 && matches ? 'calc((100vw - 1280px) / 2)' : 16,
                 '&:hover': {
-                  backgroundColor: item.selected ? undefined : theme.colors.hoverBackground,
+                  backgroundColor: isItemSelected ? undefined : theme.colors.hoverBackground,
                   border: `2px solid ${
-                    item.selected ? theme.colors.mediumBorder : theme.colors.lightBorder
+                    isItemSelected ? theme.colors.mediumBorder : theme.colors.lightBorder
                   }`,
-                  boxShadow: item.selected
+                  boxShadow: isItemSelected
                     ? '0 0 2px 0.5px rgb(21 21 21 / 5%), 0 1px 5px 0 rgb(21 21 21 / 15%)'
                     : undefined,
                 },
               })}
-              key={item.label}
+              key={item.categoryId}
             >
-              <Text sx={(theme) => ({ color: theme.colors.lightGrey })}>
-                {item.label} ({item.quantity})
+              <Text sx={(theme) => ({ color: theme.colors.lightGrey, textAlign: 'center' })}>
+                {item.categoryName}
               </Text>
             </Box>
           );
