@@ -27,7 +27,7 @@ const FilterList = ({
 }) => {
   const { data: session } = useSession();
   const { data, error } = useSWR<CategoryListResponse>(() => [
-    `categories?onlyActive=true`,
+    `website/categories?onlyActive=true`,
     'GET',
     {},
     session?.accessToken,

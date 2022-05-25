@@ -7,19 +7,23 @@ import {
   Button,
   Group,
   Skeleton,
+  Anchor,
 } from '@mantine/core';
 import Link from 'next/link';
 import { ChevronRight, ShoppingCart } from 'tabler-icons-react';
 import { createStyles } from '@mantine/core';
 import AccordionLabel from '../components/DetailProduct/AccordionLabel';
 import { useMediaQuery } from '@mantine/hooks';
-import { useRouter } from 'next/router';
+import Router, { useRouter } from 'next/router';
 import useSWR from 'swr';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import OptionItem from '../components/DetailProduct/OptionItem';
 import React from 'react';
 import RotateImage from '../components/DetailProduct/RotateImage';
 import { useSession } from 'next-auth/react';
+import * as _ from 'lodash';
+import { axiosFetcher } from '../utils/fetcher';
+import { showNotification } from '@mantine/notifications';
 
 const useStyles = createStyles((theme, _params) => ({
   breadcrumbsContainer: {
@@ -296,6 +300,7 @@ export interface Variant {
   sku: string;
   image: string;
   options: Option[];
+  variantId: number;
 }
 interface Product {
   brandId: number;
@@ -316,6 +321,13 @@ interface ProductResponse {
   timestamp: string;
 }
 
+interface VariantResponse {
+  content: Variant;
+  error: string;
+  status: number;
+  timestamp: string;
+}
+
 interface OptionResponse {
   content: Option[];
   error: string;
@@ -329,21 +341,77 @@ const Product = () => {
   const router = useRouter();
   const { id } = router.query;
   const { data: session } = useSession();
-  const { data, error } = useSWR<ProductResponse>(() => [
-    `products/${id}`,
-    'GET',
-    {},
-    session?.accessToken,
-  ]);
+  const [selectedOptions, setSelectedOptions] = React.useState<Option[]>([]);
+  const { data, error } = useSWR<ProductResponse>(() => [`website/products/${id}`], axiosFetcher, {
+    onSuccess: (data) => {
+      setSelectedOptions(data.content.variants[0].options);
+    },
+  });
+  const selectedOptionUrl =
+    selectedOptions.length === 0
+      ? ''
+      : selectedOptions.map((option) => `&optionValues=${option.optionValue}`).join('');
+  const { data: selectedVariant, error: variantError } = useSWR<VariantResponse>(
+    selectedOptionUrl ? () => [`website/variants/search?productId=${id}${selectedOptionUrl}`] : null
+  );
   const { data: optionData, error: optionError } = useSWR<OptionResponse>(() => [
-    `products/${id}/option`,
-    'GET',
-    {},
-    session?.accessToken,
+    `website/products/${id}/option`,
   ]);
 
   const isLoadingInitialData = !data && !error;
-  const [selectedVariantIndex, setSelectedVariantIndex] = React.useState(0);
+
+  const isLoadingVariant = !variantError && !selectedVariant;
+
+  const addCart = async () => {
+    if (!!!session?.accessToken) {
+      showNotification({
+        title: 'Need login!',
+        message: (
+          <Text>
+            <Anchor
+              sx={(theme) => ({
+                color: '#4F8DC1',
+                transition: 'color 400ms cubic-bezier(0.4, 0, 0.2, 1)',
+                '&:hover': {
+                  color: '#6FB3F2',
+                },
+              })}
+              component="a"
+            >
+              Login now
+            </Anchor>{' '}
+            to continue your shopping!
+          </Text>
+        ),
+        color: 'yellow',
+      });
+    } else {
+      const addCartResponse = await axiosFetcher(
+        'orders/add-item',
+        'POST',
+        {
+          variantId: selectedVariant?.content.variantId,
+          quantity: 1,
+        },
+        session?.accessToken
+      );
+
+      if (addCartResponse.status === 200) {
+        showNotification({
+          title: 'Success',
+          message: 'Add product into cart successfully!',
+          color: 'blue',
+        });
+        Router.push('/cart');
+      } else {
+        showNotification({
+          title: 'Failure',
+          message: addCartResponse.message,
+          color: 'red',
+        });
+      }
+    }
+  };
 
   return (
     <>
@@ -375,11 +443,11 @@ const Product = () => {
           <Box className={classes.productTitleMobile}>
             <Text size="xl">{data?.content.productName}</Text>
             <Text size="xl" sx={(theme) => ({ color: theme.colors.lightGrey })} mt="lg">
-              ${data?.content.variants[0].price}
+              ${selectedVariant?.content.price}
             </Text>
           </Box>
           <Box className={`${classes.productImage} ${classes.productCol}`} draggable={false}>
-            <RotateImage image={data?.content.variants[selectedVariantIndex].image} />
+            <RotateImage image={selectedVariant?.content.image} />
           </Box>
           <Box className={classes.productColCart}>
             <Box className={classes.productTitle} pt="xl" mt="xl">
@@ -388,11 +456,11 @@ const Product = () => {
               ) : (
                 <Text size="xl">{data?.content.productName}</Text>
               )}
-              {isLoadingInitialData ? (
+              {isLoadingInitialData || isLoadingVariant ? (
                 <Skeleton height={18} width={60} mt="lg" />
               ) : (
                 <Text size="xl" sx={(theme) => ({ color: theme.colors.lightGrey })} mt="lg">
-                  ${data?.content.variants[0].price}
+                  ${selectedVariant?.content.price}
                 </Text>
               )}
             </Box>
@@ -404,89 +472,47 @@ const Product = () => {
                 border: `1px solid ${theme.colors.lightBorder}`,
               })}
             >
-              <Accordion.Item label={<AccordionLabel index={1} title="Choose Fabric" />}>
-                <ScrollContainer
-                  style={{
-                    height: 107,
-                    display: 'flex',
-                  }}
-                >
-                  {optionData?.content
-                    .filter((item) => item.optionName === 'Chất liệu')
-                    .map((item) => {
-                      return (
-                        <Box
-                          onClick={() => {
-                            const selectingIndex = data?.content.variants.findIndex(
-                              (variantItem) =>
-                                variantItem.options.filter(
-                                  (optionItem) => optionItem.optionName === 'Chất liệu'
-                                )[0].optionValue === item.optionValue &&
-                                variantItem.options.filter(
-                                  (optionItem) => optionItem.optionName === 'Chất liệu chân'
-                                )[0].optionValue ===
-                                  data?.content.variants[selectedVariantIndex].options.find(
-                                    (selectedItem) => selectedItem.optionName === 'Chất liệu chân'
-                                  )?.optionValue
-                            );
-                            setSelectedVariantIndex(selectingIndex || selectedVariantIndex);
-                          }}
-                        >
-                          <OptionItem
-                            data={item}
-                            selected={
-                              data?.content.variants[selectedVariantIndex].options.find(
-                                (selectedItem) => selectedItem.optionValue === item.optionValue
-                              ) !== undefined
-                            }
-                          />
-                        </Box>
-                      );
-                    })}
-                </ScrollContainer>
-              </Accordion.Item>
-
-              <Accordion.Item label={<AccordionLabel index={2} title="Choose Legs" />}>
-                <ScrollContainer
-                  style={{
-                    height: 107,
-                    display: 'flex',
-                  }}
-                >
-                  {optionData?.content
-                    .filter((item) => item.optionName === 'Chất liệu chân')
-                    .map((item) => {
-                      return (
-                        <Box
-                          onClick={() => {
-                            const selectingIndex = data?.content.variants.findIndex(
-                              (variantItem) =>
-                                variantItem.options.filter(
-                                  (optionItem) => optionItem.optionName === 'Chất liệu chân'
-                                )[0].optionValue === item.optionValue &&
-                                variantItem.options.filter(
-                                  (optionItem) => optionItem.optionName === 'Chất liệu'
-                                )[0].optionValue ===
-                                  data?.content.variants[selectedVariantIndex].options.find(
-                                    (selectedItem) => selectedItem.optionName === 'Chất liệu'
-                                  )?.optionValue
-                            );
-                            setSelectedVariantIndex(selectingIndex || selectedVariantIndex);
-                          }}
-                        >
-                          <OptionItem
-                            data={item}
-                            selected={
-                              data?.content.variants[selectedVariantIndex].options.find(
-                                (selectedItem) => selectedItem.optionValue === item.optionValue
-                              ) !== undefined
-                            }
-                          />
-                        </Box>
-                      );
-                    })}
-                </ScrollContainer>
-              </Accordion.Item>
+              {Object.entries(_.groupBy(optionData?.content, 'optionName')).map(
+                (optionType, index) => {
+                  const optionTypeName = optionType[0];
+                  const optionList = optionType[1];
+                  return (
+                    <Accordion.Item
+                      label={
+                        <AccordionLabel index={index + 1} title={`Choose ${optionTypeName}`} />
+                      }
+                    >
+                      <ScrollContainer
+                        style={{
+                          height: 107,
+                          display: 'flex',
+                        }}
+                      >
+                        {optionList.map((item) => (
+                          <Box
+                            onClick={() => {
+                              setSelectedOptions((oldOptions) =>
+                                oldOptions.map((option) =>
+                                  option.optionId === item.optionId ? item : option
+                                )
+                              );
+                            }}
+                          >
+                            <OptionItem
+                              data={item}
+                              selected={
+                                selectedOptions.find(
+                                  (selectedItem) => selectedItem.optionValue === item.optionValue
+                                ) !== undefined
+                              }
+                            />
+                          </Box>
+                        ))}
+                      </ScrollContainer>
+                    </Accordion.Item>
+                  );
+                }
+              )}
             </Accordion>
             <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} mt="xl">
               <Button
@@ -498,13 +524,14 @@ const Product = () => {
                 radius="xl"
                 size="lg"
                 fullWidth={matches}
+                onClick={addCart}
               >
                 <Group position="apart" align="center">
-                  {isLoadingInitialData ? (
+                  {isLoadingInitialData || isLoadingVariant ? (
                     <Skeleton height={20} width={60} />
                   ) : (
                     <Text size="xl" mt={8}>
-                      ${data?.content.variants[0].price}
+                      ${selectedVariant?.content.price}
                     </Text>
                   )}
 

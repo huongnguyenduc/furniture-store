@@ -51,7 +51,7 @@ const SortList = ({
   const { classes } = useStyles();
   const { data: session } = useSession();
   const { data, error } = useSWR<BrandListResponse>(() => [
-    `brands?onlyActive=true`,
+    `website/brands?onlyActive=true`,
     'GET',
     {},
     session?.accessToken,

@@ -1,8 +1,50 @@
-import { Box, Button, Grid, Group, Image, Text } from '@mantine/core';
+import { Box, Grid, Group, Image, Text } from '@mantine/core';
+import { useSession } from 'next-auth/react';
+import Router from 'next/router';
 import React from 'react';
-import { X } from 'tabler-icons-react';
+import { KeyedMutator } from 'swr/dist/types';
+import { CartItem, CartResponse } from '../../pages/cart';
+import { axiosFetcher } from '../../utils/fetcher';
 
-const CartItem = () => {
+const CartItem = ({ data, update }: { data: CartItem; update: KeyedMutator<CartResponse> }) => {
+  const { data: session } = useSession();
+  const addItemQuantity = async () => {
+    const addItemResponse = await axiosFetcher(
+      'orders/add-item',
+      'POST',
+      {
+        variantId: data.variant.variantId,
+        quantity: 1 + data.quantity,
+      },
+      session?.accessToken
+    );
+    update(addItemResponse);
+  };
+
+  const minusItemQuantity = async () => {
+    if (data.quantity > 1) {
+      const minusItemResponse = await axiosFetcher(
+        'orders/add-item',
+        'POST',
+        {
+          variantId: data.variant.variantId,
+          quantity: data.quantity - 1,
+        },
+        session?.accessToken
+      );
+      update(minusItemResponse);
+    }
+  };
+
+  const removeItemQuantity = async () => {
+    const removeItemResponse = await axiosFetcher(
+      'orders/remove-item',
+      'POST',
+      data.variant.variantId,
+      session?.accessToken
+    );
+    update(removeItemResponse);
+  };
   return (
     <Box
       sx={(theme) => ({ borderTop: `1px solid ${theme.colors.lightBorder}`, position: 'relative' })}
@@ -12,11 +54,13 @@ const CartItem = () => {
     >
       <Grid>
         <Grid.Col sm={5}>
-          <Box sx={(theme) => ({ border: `1px solid ${theme.colors.lightBorder}` })}>
-            <Image
-              alt="image"
-              src="https://content.cylindo.com/api/v2/4472/products/ALXR.LEATHR.CHAR.ACCENT/frames/1/ALXR.LEATHR.CHAR.ACCENT.JPG?background=FFFFFF&feature=COLOR:LTHR-02&feature=FINISH:LEG005-3"
-            />
+          <Box
+            sx={(theme) => ({ border: `1px solid ${theme.colors.lightBorder}`, cursor: 'pointer' })}
+            onClick={() => {
+              Router.push(`/product?id=${data.variant.productId}`);
+            }}
+          >
+            <Image alt="image" src={data.variant.image} />
           </Box>
         </Grid.Col>
         <Grid.Col sm={1} />
@@ -30,7 +74,7 @@ const CartItem = () => {
               <Text
                 sx={(theme) => ({ color: theme.colors.mixGrey, fontSize: 22, textAlign: 'right' })}
               >
-                $2045 x 2
+                ${data.variant.price} x {data.quantity}
               </Text>
               <Text
                 size="xl"
@@ -41,7 +85,7 @@ const CartItem = () => {
                   textAlign: 'right',
                 })}
               >
-                $4090
+                ${data.variant.price * data.quantity}
               </Text>
             </Box>
             <Text
@@ -54,25 +98,26 @@ const CartItem = () => {
                 lineHeight: 1.1,
                 cursor: 'pointer',
               })}
+              onClick={() => {
+                Router.push(`/product?id=${data.variant.productId}`);
+              }}
             >
-              SLOAN
+              {data.variant.brandName}
             </Text>
             <Text sx={(theme) => ({ color: theme.colors.lightGrey, lineHeight: 1.35 })} size="lg">
-              Fabric 2-Seat Sofa
+              {data.variant.productName}
             </Text>
-            <Box mt={10}>
-              <Text sx={(theme) => ({ color: theme.colors.mediumGrey })}>Color</Text>
-              <Group mt={4}>
-                <Image
-                  width={20}
-                  height={20}
-                  src="https://media.interiordefine.com/media//swatches/thumbnail/1635282882_bi-132_perf-textured-weave_opal.jpg"
-                />
-                <Text sx={(theme) => ({ color: theme.colors.lightGrey })} mt={5}>
-                  Performance Textured Weave - Opal
-                </Text>
-              </Group>
-            </Box>
+            {data.variant.options.map((item) => (
+              <Box mt={10}>
+                <Text sx={(theme) => ({ color: theme.colors.mediumGrey })}>{item.optionName}</Text>
+                <Group mt={4}>
+                  <Image width={20} height={20} src={item.optionImage} />
+                  <Text sx={(theme) => ({ color: theme.colors.lightGrey })} mt={5}>
+                    {item.optionValue}
+                  </Text>
+                </Group>
+              </Box>
+            ))}
             <Box mt={20}>
               <Text
                 sx={(theme) => ({
@@ -87,6 +132,7 @@ const CartItem = () => {
             </Box>
             <Group position="apart" mt="md" sx={{ position: 'relative' }}>
               <Box
+                onClick={removeItemQuantity}
                 sx={(theme) => ({
                   border: `1px solid ${theme.colors.deepBorder}`,
                   color: theme.colors.lightGrey,
@@ -126,6 +172,7 @@ const CartItem = () => {
               </Box>
               <Group>
                 <Box
+                  onClick={minusItemQuantity}
                   sx={(theme) => ({
                     border: `1px solid ${theme.colors.deepBorder}`,
                     color: theme.colors.lightGrey,
@@ -165,8 +212,9 @@ const CartItem = () => {
                     },
                   })}
                 />
-                <Text>1</Text>
+                <Text>{data.quantity}</Text>
                 <Box
+                  onClick={addItemQuantity}
                   sx={(theme) => ({
                     border: `1px solid ${theme.colors.deepBorder}`,
                     color: theme.colors.lightGrey,

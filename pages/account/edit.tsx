@@ -3,6 +3,10 @@ import React, { ReactElement } from 'react';
 import { useForm } from '@mantine/form';
 import AccountLayout from '../../components/Layout/AccountLayout/AccountLayout';
 import { createStyles } from '@mantine/core';
+import { useSession } from 'next-auth/react';
+import useSWR from 'swr';
+import { axiosFetcher } from '../../utils/fetcher';
+import { showNotification } from '@mantine/notifications';
 
 const useStyles = createStyles((theme, _params) => ({
   sectionContainer: {
@@ -10,20 +14,49 @@ const useStyles = createStyles((theme, _params) => ({
     border: `1px solid ${theme.colors.lightBorder}`,
     borderRadius: '5px',
     [`@media (min-width: ${theme.breakpoints.sm}px)`]: {
-      // Type safe child reference in nested selectors via ref
       padding: '1.65em 29px 2.8em',
     },
   },
 }));
 
+interface User {
+  userId: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+  phoneNo: string;
+  address: string;
+  imgUrl: string;
+  email: string;
+}
+export interface UserResponse {
+  content: User;
+  error: string;
+  status: number;
+  timestamp: string;
+}
+
 const EditAccount = () => {
+  const { data: session } = useSession();
+  const { data, error } = useSWR<UserResponse>(
+    () => [`profile/me`, 'GET', {}, session?.accessToken],
+    axiosFetcher,
+    {
+      onSuccess: (data) => {
+        const { username, firstName, lastName, phoneNo, address, email } = data.content;
+        form.setValues({ username, firstName, lastName, phoneNo, address, email });
+      },
+    }
+  );
   const { classes } = useStyles();
   const form = useForm({
     initialValues: {
       email: '',
       firstName: '',
       lastName: '',
-      password: '',
+      address: '',
+      phoneNo: '',
+      username: '',
     },
 
     validate: {
@@ -33,6 +66,13 @@ const EditAccount = () => {
         )
           ? null
           : 'Invalid email',
+      username: (value) => (value.length > 3 ? null : 'Invalid username'),
+      address: (value) =>
+        value == undefined
+          ? 'Address is required'
+          : /^[#.0-9a-zA-Z\s,-]+$/u.test(value)
+          ? null
+          : 'Invalid Address',
       firstName: (value) =>
         value == undefined
           ? 'First name is required'
@@ -41,6 +81,12 @@ const EditAccount = () => {
             )
           ? null
           : 'Invalid First name',
+      phoneNo: (value) =>
+        value == undefined
+          ? 'Phone number is required'
+          : /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/.test(value)
+          ? null
+          : 'Invalid Phone number',
       lastName: (value) =>
         value == undefined
           ? 'Last name is required'
@@ -49,22 +95,25 @@ const EditAccount = () => {
             )
           ? null
           : 'Invalid Last name',
-      password: (value) => (value.length > 6 && /.\S/.test(value) ? null : 'Invalid password'),
+      // password: (value) => (value.length > 6 && /.\S/.test(value) ? null : 'Invalid password'),
     },
   });
   const passwordForm = useForm({
     initialValues: {
-      current: '',
-      new: '',
-      confirmNew: '',
+      oldPassword: '',
+      newPassword: '',
+      confirmPassword: '',
     },
 
     validate: {
-      current: (value) => (value.length > 6 && /.\S/.test(value) ? null : 'Invalid password'),
-      new: (value) => (value.length > 6 && /.\S/.test(value) ? null : 'Invalid password'),
-      confirmNew: (value, values) => (value !== values.new ? 'Passwords did not match' : null),
+      oldPassword: (value) => (value.length > 6 && /.\S/.test(value) ? null : 'Invalid password'),
+      newPassword: (value) => (value.length > 6 && /.\S/.test(value) ? null : 'Invalid password'),
+      confirmPassword: (value, values) =>
+        value !== values.newPassword ? 'Passwords did not match' : null,
     },
   });
+  const [formError, setFormError] = React.useState<string | null>(null);
+  const [formPasswordError, setFormPasswordError] = React.useState<string | null>(null);
   return (
     <Box py={32}>
       <Grid>
@@ -78,29 +127,40 @@ const EditAccount = () => {
               size="xl"
               transform="capitalize"
             >
-              Edit Contact Information
+              Edit User Information
             </Text>
             <Box>
               <form
-                onSubmit={form.onSubmit((values) => console.log(values))}
+                onSubmit={form.onSubmit(async (values) => {
+                  const updateUserResponse = await axiosFetcher(
+                    'profile/me',
+                    'PUT',
+                    {
+                      ...values,
+                      imgUrl: '',
+                    },
+                    session?.accessToken
+                  );
+                  if (updateUserResponse.status === 200) {
+                    setFormError(null);
+                    showNotification({
+                      title: 'Success!',
+                      message: 'Update user profile successfully!',
+                      color: 'blue',
+                    });
+                  } else {
+                    setFormError(updateUserResponse.message);
+                  }
+                })}
                 style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}
               >
+                <Text color="red">{formError}</Text>
                 <TextInput label="First Name" size="md" {...form.getInputProps('firstName')} />
                 <TextInput label="Last Name" size="md" {...form.getInputProps('lastName')} />
                 <TextInput label="Email Address" size="md" {...form.getInputProps('email')} />
-                <PasswordInput
-                  label="Current Password"
-                  styles={(theme) => ({
-                    label: {
-                      color: theme.colors.lightGrey,
-                      lineHeight: 1.35,
-                      letterSpacing: '0.023em',
-                      fontWeight: 400,
-                    },
-                  })}
-                  size="md"
-                  {...form.getInputProps('password')}
-                />
+                <TextInput label="Address" size="md" {...form.getInputProps('address')} />
+                <TextInput label="Phone number" size="md" {...form.getInputProps('phoneNo')} />
+                <TextInput label="Username" size="md" {...form.getInputProps('username')} />
                 <Group position="left">
                   <Button
                     type="submit"
@@ -143,9 +203,30 @@ const EditAccount = () => {
             </Text>
             <Box>
               <form
-                onSubmit={passwordForm.onSubmit((values) => console.log(values))}
+                onSubmit={passwordForm.onSubmit(async (values) => {
+                  const updatePasswordResponse = await axiosFetcher(
+                    'profile/me/change-password',
+                    'POST',
+                    {
+                      ...values,
+                      username: data?.content.username,
+                    },
+                    session?.accessToken
+                  );
+                  if (updatePasswordResponse.status === 200) {
+                    setFormPasswordError(null);
+                    showNotification({
+                      title: 'Success!',
+                      message: 'Update user password successfully!',
+                      color: 'blue',
+                    });
+                  } else {
+                    setFormPasswordError(updatePasswordResponse.message);
+                  }
+                })}
                 style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}
               >
+                <Text color="red">{formPasswordError}</Text>
                 <PasswordInput
                   label="Current Password"
                   styles={(theme) => ({
@@ -157,7 +238,7 @@ const EditAccount = () => {
                     },
                   })}
                   size="md"
-                  {...passwordForm.getInputProps('current')}
+                  {...passwordForm.getInputProps('oldPassword')}
                 />
                 <PasswordInput
                   label="New Password"
@@ -170,7 +251,7 @@ const EditAccount = () => {
                     },
                   })}
                   size="md"
-                  {...passwordForm.getInputProps('new')}
+                  {...passwordForm.getInputProps('newPassword')}
                 />
                 <PasswordInput
                   label="Confirm New Password"
@@ -183,7 +264,7 @@ const EditAccount = () => {
                     },
                   })}
                   size="md"
-                  {...passwordForm.getInputProps('confirmNew')}
+                  {...passwordForm.getInputProps('confirmPassword')}
                 />
                 <Group position="left">
                   <Button

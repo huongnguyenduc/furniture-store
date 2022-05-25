@@ -60,6 +60,23 @@ function CategoryHeader({
                         transition: 'transform 400ms cubic-bezier(0.4, 0, 0.2, 1)',
                         cursor: 'pointer',
                       }}
+                      onClick={() => {
+                        if (item.categoryId) {
+                          const subCategoriesUrl =
+                            typeof item.items[0] === 'string'
+                              ? ''
+                              : item.items
+                                  .map((subItem) =>
+                                    typeof subItem === 'string'
+                                      ? ''
+                                      : `&subCategories=${subItem.categoryId}`
+                                  )
+                                  .join('');
+                          Router.push(
+                            `search?q=${''}&category=${item.categoryId}${subCategoriesUrl}`
+                          );
+                        }
+                      }}
                     >
                       <MediaQuery smallerThan="lg" styles={{ display: 'none' }}>
                         <Image src={item.image} alt={item.label} height={50} />
@@ -72,7 +89,7 @@ function CategoryHeader({
                         {item.label}
                       </Text>
                     </Group>
-                    {item.items.map((item) => (
+                    {item.items.map((subItem) => (
                       <Text
                         pb="lg"
                         sx={{
@@ -83,9 +100,18 @@ function CategoryHeader({
                           transition: 'transform 400ms cubic-bezier(0.4, 0, 0.2, 1)',
                           cursor: 'pointer',
                         }}
-                        key={`${item}-header`}
+                        key={`${subItem.toString()}-header`}
+                        onClick={() => {
+                          if (typeof subItem !== 'string') {
+                            Router.push(
+                              `search?q=${''}&category=${item.categoryId}&subCategories=${
+                                subItem.categoryId
+                              }`
+                            );
+                          }
+                        }}
                       >
-                        {item}
+                        {typeof subItem === 'string' ? subItem : subItem.label}
                       </Text>
                     ))}
                   </div>

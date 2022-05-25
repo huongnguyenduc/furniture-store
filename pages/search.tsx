@@ -4,12 +4,11 @@ import { Box, Button, Container, Grid } from '@mantine/core';
 import FilterList from '../components/Search/FilterList/FilterList';
 import ProductItem from '../components/ProductItem';
 import SearchTitle from '../components/Search/Title/SearchTitle';
-
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { fetcher } from '../utils/fetcher';
 import { useSession } from 'next-auth/react';
 import SortList from '../components/Search/SortList/SortList';
+import CategoryTitle from '../components/Search/Title/CategoryTitle';
 
 const PAGE_SIZE = 6;
 
@@ -33,20 +32,44 @@ export enum SortDirection {
   Down = 'DESC',
 }
 
+interface Category {
+  categoryId: number;
+  categoryName: string;
+  categoryDesc: string;
+}
+interface CategoryResponse {
+  content: Category;
+  error: string;
+  status: number;
+  timestamp: string;
+}
+
 const Search = () => {
   const router = useRouter();
-  const { q } = router.query;
+  const { q, subCategories, category } = router.query;
   const { data: session } = useSession();
+  const { data: categoryData } = useSWR<CategoryResponse>(() => [
+    `website/categories/${category}`,
+    'GET',
+    {},
+  ]);
+  React.useEffect(() => {}, [category, subCategories]);
   const [sortValue, setSortValue] = React.useState<SortValue>(SortValue.ProductId);
   const [sortDirection, setSortDirection] = React.useState<SortDirection>(SortDirection.Up);
   const [brandIdList, setBrandIdList] = React.useState<number[]>([]);
   const brandListUrl =
     brandIdList.length === 0 ? '' : brandIdList.map((id) => `&brandId=${id}`).join('');
-  const [categoryIdList, setCategoryIdList] = React.useState<number[]>([]);
+  const [categoryIdList, setCategoryIdList] = React.useState<number[]>(
+    subCategories
+      ? Array.isArray(subCategories)
+        ? subCategories.map((id) => parseInt(id))
+        : [parseInt(subCategories)]
+      : []
+  );
   const categoryListUrl =
     categoryIdList.length === 0 ? '' : categoryIdList.map((id) => `&categoryId=${id}`).join('');
   const { data, error, size, setSize } = useSWRInfinite<SearchPage>((index) => [
-    `products/search?productName=${q}&pageNumber=${index}&pageSize=${PAGE_SIZE}&sortBy=${sortValue}&sortDirection=${sortDirection}${categoryListUrl}${brandListUrl}`,
+    `website/products/search?productName=${q}&pageNumber=${index}&pageSize=${PAGE_SIZE}&sortBy=${sortValue}&sortDirection=${sortDirection}${categoryListUrl}${brandListUrl}`,
     'GET',
     {},
     session?.accessToken,
@@ -62,7 +85,14 @@ const Search = () => {
 
   return (
     <Box sx={{ position: 'relative' }}>
-      <SearchTitle productCount={data ? data[0].content.totalElements : 0} query={q} />
+      {category ? (
+        <CategoryTitle
+          category={categoryData?.content.categoryName}
+          categoryDesc={categoryData?.content.categoryDesc}
+        />
+      ) : (
+        <SearchTitle productCount={data ? data[0].content.totalElements : 0} query={q} />
+      )}
       <FilterList selectedCategoryId={categoryIdList} setSelectedCategoryId={setCategoryIdList} />
       <SortList
         selectedBrandId={brandIdList}

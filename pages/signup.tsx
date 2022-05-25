@@ -1,13 +1,16 @@
 import { Box, Button, Container, Group, PasswordInput, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import React from 'react';
+import { axiosFetcher } from '../utils/fetcher';
+import { signIn, getCsrfToken, SignInResponse } from 'next-auth/react';
+import Router from 'next/router';
+import { showNotification } from '@mantine/notifications';
 
 const SignUp = () => {
   const form = useForm({
     initialValues: {
       email: '',
-      firstName: '',
-      lastName: '',
+      username: '',
       password: '',
       confirmPassword: '',
     },
@@ -21,25 +24,27 @@ const SignUp = () => {
           : 'Invalid email',
       confirmPassword: (value, values) =>
         value !== values.password ? 'Passwords did not match' : null,
-      firstName: (value) =>
-        value == undefined
-          ? 'First name is required'
-          : /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/u.test(
-              value
-            )
-          ? null
-          : 'Invalid First name',
-      lastName: (value) =>
-        value == undefined
-          ? 'Last name is required'
-          : /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/u.test(
-              value
-            )
-          ? null
-          : 'Invalid Last name',
+      username: (value) => (value.length > 3 ? null : 'Invalid username'),
+      // firstName: (value) =>
+      //   value == undefined
+      //     ? 'First name is required'
+      //     : /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/u.test(
+      //         value
+      //       )
+      //     ? null
+      //     : 'Invalid First name',
+      // lastName: (value) =>
+      //   value == undefined
+      //     ? 'Last name is required'
+      //     : /^[a-zA-ZàáâäãåąčćęèéêëėįìíîïłńòóôöõøùúûüųūÿýżźñçčšžÀÁÂÄÃÅĄĆČĖĘÈÉÊËÌÍÎÏĮŁŃÒÓÔÖÕØÙÚÛÜŲŪŸÝŻŹÑßÇŒÆČŠŽ∂ð ,.'-]+$/u.test(
+      //         value
+      //       )
+      //     ? null
+      //     : 'Invalid Last name',
       password: (value) => (value.length > 6 && /.\S/.test(value) ? null : 'Invalid password'),
     },
   });
+  const [formError, setFormError] = React.useState<string | null>(null);
   return (
     <Container size="xs" py={96}>
       <Box>
@@ -57,12 +62,43 @@ const SignUp = () => {
       </Box>
       <Box>
         <form
-          onSubmit={form.onSubmit((values) => console.log(values))}
+          onSubmit={form.onSubmit(async (values) => {
+            const registerResponse = await axiosFetcher('auth/register', 'POST', { ...values });
+            if (registerResponse.status === 201) {
+              setFormError(null);
+              const res: SignInResponse | undefined = await signIn('credentials', {
+                redirect: false,
+                username: values.username,
+                password: values.password,
+                callbackUrl: `${window.location.origin}`,
+              });
+              if (res !== undefined) {
+                const { error, url } = res;
+                console.log(res);
+                if (error) {
+                  setFormError(error);
+                } else {
+                  setFormError(null);
+                }
+                if (url) {
+                  Router.push(url);
+                  showNotification({
+                    title: 'Success!',
+                    message: 'Your account is created successfully! 🤥',
+                    color: 'blue',
+                  });
+                }
+              }
+            } else {
+              setFormError(registerResponse.error);
+            }
+            console.log(values);
+          })}
           style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}
           autoComplete="off"
         >
-          <TextInput label="First Name" size="md" {...form.getInputProps('firstName')} />
-          <TextInput label="Last Name" size="md" {...form.getInputProps('lastName')} />
+          <Text color="red">{formError}</Text>
+          <TextInput label="Username" size="md" {...form.getInputProps('username')} />
           <TextInput
             label="Email Address"
             autoComplete="off"

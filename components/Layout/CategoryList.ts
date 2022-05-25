@@ -1,7 +1,12 @@
+export interface UnderSubCategoryItemProps {
+  label: string;
+  categoryId: number;
+}
 export interface SubCategoryItemProps {
   label: string;
   image: string;
-  items: string[];
+  items: UnderSubCategoryItemProps[] | string[];
+  categoryId?: number;
 }
 export interface CategoryItemProps {
   label: string;
@@ -18,20 +23,22 @@ export const categoryList: CategoryItemProps[] = [
       {
         label: 'Sectionals',
         image: 'https://pngimg.com/uploads/sofa/sofa_PNG6950.png',
+        categoryId: 2,
         items: [
-          'Chaise sectionals',
-          'Corner sectionals',
-          'Bumper sectionals',
-          'U-sectionals',
-          'Sleeper sectionals',
-          'Storage sectionals',
-          'Modular sectionals',
-          'All sectionals',
+          { label: 'Chaise sectionals', categoryId: 3 },
+          // 'Corner sectionals',
+          // 'Bumper sectionals',
+          { label: 'U-sectionals', categoryId: 4 },
+          { label: 'Sleeper sectionals', categoryId: 5 },
+          // 'Storage sectionals',
+          // 'Modular sectionals',
+          { label: 'All sectionals', categoryId: 2 },
         ],
       },
       {
         label: 'Sofas',
         image: 'https://pngimg.com/uploads/sofa/sofa_PNG6916.png',
+        categoryId: 6,
         items: ['Loveseats', 'Sofas', 'Daybeds', 'Sleeper sofas', 'Modular sofas', 'All sofas'],
       },
       {

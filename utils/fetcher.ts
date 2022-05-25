@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export function axiosFetcher(endpoint = '/', method = 'GET', body = {}, cookie = false) {
+export function axiosFetcher(endpoint = '/', method = 'GET', body = {}, cookie: any = false) {
   return axios({
     method: method,
     url: `${process.env.NEXT_PUBLIC_API_URL}/${endpoint}`,

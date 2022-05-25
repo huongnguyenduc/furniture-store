@@ -12,6 +12,9 @@ import { createStyles } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import CartItem from '../components/Cart/CartItem';
 import { ArrowNarrowRight } from 'tabler-icons-react';
+import useSWR from 'swr';
+import { useSession } from 'next-auth/react';
+import { Variant } from './product';
 
 const useStyles = createStyles((theme, _params) => ({
   titleContainer: {
@@ -152,9 +155,40 @@ const useStyles = createStyles((theme, _params) => ({
   },
 }));
 
+interface CartVariant extends Variant {
+  brandName: string;
+  categoryName: string;
+  productName: string;
+  productId: number;
+}
+export interface CartItem {
+  variant: CartVariant;
+  quantity: number;
+}
+interface Cart {
+  orderId: number;
+  voucher: string;
+  totalPrice: number;
+  orderDetails: CartItem[];
+}
+
+export interface CartResponse {
+  content: Cart;
+  errors: string;
+  status: number;
+  timestamp: string;
+}
+
 const ShoppingCart = () => {
   const { classes } = useStyles();
   const matches = useMediaQuery('(min-width: 992px)', false);
+  const { data: session } = useSession();
+  const { data, error, mutate } = useSWR<CartResponse>(() => [
+    `orders/cart`,
+    'GET',
+    {},
+    session?.accessToken,
+  ]);
   return (
     <>
       <Container size={1280}>
@@ -166,183 +200,194 @@ const ShoppingCart = () => {
           </Box>
         </Box>
       </Container>
-      <Box className={`${classes.cartContainer} ${classes.cartContainerTop}`}>
-        <Box className={classes.cartRow}>
-          <Box className={`${classes.cartImage} ${classes.cartCol}`}>
-            <Box className={classes.cartList}>
-              <CartItem />
-              <CartItem />
-              <CartItem />
-              <CartItem />
+      {!!!data?.content ? (
+        <Box className={`${classes.cartContainer} ${classes.cartContainerTop}`}>
+          <Box className={classes.cartRow}>
+            <Box className={`${classes.cartImage} ${classes.cartCol}`}>
+              <Box className={classes.cartList}>
+                <Text mt={matches ? 'md' : 0}>You have no items in your shopping cart.</Text>
+              </Box>
             </Box>
-          </Box>
-          <Box className={classes.cartColPrice}>
-            <Box className={classes.cartTitle} mt="xl">
-              <MediaQuery smallerThan="md" styles={{ marginLeft: '14px' }}>
-                <Text size="xl" sx={(theme) => ({ color: theme.colors.lightGrey })}>
-                  Order Summary
-                </Text>
-              </MediaQuery>
-            </Box>
-            <Box
-              sx={(theme) => ({
-                border: `1px solid ${theme.colors.lightBorder}`,
-                background: theme.white,
-              })}
-              mt={20}
-            >
-              <Group
-                position="apart"
-                p={15}
-                sx={(theme) => ({
-                  borderBottom: `1px solid ${theme.colors.lightBorder}`,
-                })}
-              >
-                <Text
-                  sx={(theme) => ({
-                    color: theme.colors.lightGrey,
-                    fontWeight: 300,
-                    lineHeight: 1.6,
-                    letterSpacing: '0.023em',
-                  })}
-                >
-                  Subtotal
-                </Text>
-                <Text
-                  sx={(theme) => ({
-                    color: theme.colors.lightGrey,
-                    fontWeight: 300,
-                    lineHeight: 1.6,
-                    letterSpacing: '0.023em',
-                  })}
-                >
-                  $6380
-                </Text>
-              </Group>
-              <Group
-                position="apart"
-                p={15}
-                sx={(theme) => ({
-                  borderBottom: `1px solid ${theme.colors.lightBorder}`,
-                })}
-              >
-                <Text
-                  sx={(theme) => ({
-                    color: theme.colors.lightGrey,
-                    fontWeight: 300,
-                    lineHeight: 1.6,
-                    letterSpacing: '0.023em',
-                  })}
-                >
-                  Shipping & handling
-                </Text>
-                <Text
-                  sx={(theme) => ({
-                    color: theme.colors.lightGrey,
-                    fontWeight: 300,
-                    lineHeight: 1.6,
-                    letterSpacing: '0.023em',
-                  })}
-                >
-                  $189
-                </Text>
-              </Group>
-              <Group
-                position="apart"
-                p={15}
-                sx={(theme) => ({
-                  background: theme.colors.hoverBackground,
-                })}
-              >
-                <Text
-                  sx={(theme) => ({
-                    color: theme.colors.lightGrey,
-                    fontWeight: 600,
-                    lineHeight: 1.6,
-                    letterSpacing: '0.1em',
-                  })}
-                  size="lg"
-                >
-                  TOTAL
-                </Text>
-                <Text
-                  sx={(theme) => ({
-                    color: theme.colors.lightGrey,
-                    fontWeight: 600,
-                    lineHeight: 1.6,
-                    letterSpacing: '0.1em',
-                  })}
-                  size="lg"
-                >
-                  $6569
-                </Text>
-              </Group>
-            </Box>
-            <Accordion
-              styles={(theme) => ({
-                content: { padding: 0 },
-                label: {
-                  color: theme.colors.lightGrey,
-                  fontWeight: 300,
-                  lineHeight: 1.6,
-                  letterSpacing: '0.023em',
-                },
-              })}
-              sx={(theme) => ({ backgroundColor: theme.white })}
-              mt={10}
-            >
-              <Accordion.Item label="Apply promotion code">
-                <Box sx={{ display: 'flex' }}>
-                  <TextInput
-                    placeholder="Enter code"
-                    radius="xs"
-                    size="md"
-                    required
-                    sx={{ flex: 2 }}
-                    mr={10}
-                  />
-                  <Button
-                    radius="xl"
-                    size="md"
-                    sx={(theme) => ({
-                      flex: 1,
-                      backgroundColor: theme.colors.brownBackground,
-                      transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
-                      '&:hover': {
-                        backgroundColor: theme.colors.hoverBrown,
-                      },
-                    })}
-                  >
-                    Apply
-                  </Button>
-                </Box>
-              </Accordion.Item>
-            </Accordion>
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} mt="xl">
-              <Button
-                sx={(theme) => ({
-                  backgroundColor: theme.colors.lightGrey,
-                  fontWeight: 400,
-                  padding: matches ? 0 : '0 60px',
-                })}
-                radius="xl"
-                size="lg"
-                fullWidth={matches}
-              >
-                <Group spacing={10}>
-                  <Text size="lg" sx={(theme) => ({ fontWeight: 300, fontSize: '17px' })} mt={8}>
-                    Checkout
-                  </Text>
-                  <ArrowNarrowRight size={28} strokeWidth={2} color="white" />
-                </Group>
-              </Button>
-            </Box>
-          </Box>
-          <Box className={`${classes.cartDetail} ${classes.cartCol}`}>
-            {/* Under the product list */}
           </Box>
         </Box>
-      </Box>
+      ) : (
+        <Box className={`${classes.cartContainer} ${classes.cartContainerTop}`}>
+          <Box className={classes.cartRow}>
+            <Box className={`${classes.cartImage} ${classes.cartCol}`}>
+              <Box className={classes.cartList}>
+                {data?.content.orderDetails.map((item) => (
+                  <CartItem data={item} update={mutate} />
+                ))}
+              </Box>
+            </Box>
+            <Box className={classes.cartColPrice}>
+              <Box className={classes.cartTitle} mt="xl">
+                <MediaQuery smallerThan="md" styles={{ marginLeft: '14px' }}>
+                  <Text size="xl" sx={(theme) => ({ color: theme.colors.lightGrey })}>
+                    Order Summary
+                  </Text>
+                </MediaQuery>
+              </Box>
+              <Box
+                sx={(theme) => ({
+                  border: `1px solid ${theme.colors.lightBorder}`,
+                  background: theme.white,
+                })}
+                mt={20}
+              >
+                <Group
+                  position="apart"
+                  p={15}
+                  sx={(theme) => ({
+                    borderBottom: `1px solid ${theme.colors.lightBorder}`,
+                  })}
+                >
+                  <Text
+                    sx={(theme) => ({
+                      color: theme.colors.lightGrey,
+                      fontWeight: 300,
+                      lineHeight: 1.6,
+                      letterSpacing: '0.023em',
+                    })}
+                  >
+                    Subtotal
+                  </Text>
+                  <Text
+                    sx={(theme) => ({
+                      color: theme.colors.lightGrey,
+                      fontWeight: 300,
+                      lineHeight: 1.6,
+                      letterSpacing: '0.023em',
+                    })}
+                  >
+                    ${data?.content.totalPrice}
+                  </Text>
+                </Group>
+                <Group
+                  position="apart"
+                  p={15}
+                  sx={(theme) => ({
+                    borderBottom: `1px solid ${theme.colors.lightBorder}`,
+                  })}
+                >
+                  <Text
+                    sx={(theme) => ({
+                      color: theme.colors.lightGrey,
+                      fontWeight: 300,
+                      lineHeight: 1.6,
+                      letterSpacing: '0.023em',
+                    })}
+                  >
+                    Shipping & handling
+                  </Text>
+                  <Text
+                    sx={(theme) => ({
+                      color: theme.colors.lightGrey,
+                      fontWeight: 300,
+                      lineHeight: 1.6,
+                      letterSpacing: '0.023em',
+                    })}
+                  >
+                    $0
+                  </Text>
+                </Group>
+                <Group
+                  position="apart"
+                  p={15}
+                  sx={(theme) => ({
+                    background: theme.colors.hoverBackground,
+                  })}
+                >
+                  <Text
+                    sx={(theme) => ({
+                      color: theme.colors.lightGrey,
+                      fontWeight: 600,
+                      lineHeight: 1.6,
+                      letterSpacing: '0.1em',
+                    })}
+                    size="lg"
+                  >
+                    TOTAL
+                  </Text>
+                  <Text
+                    sx={(theme) => ({
+                      color: theme.colors.lightGrey,
+                      fontWeight: 600,
+                      lineHeight: 1.6,
+                      letterSpacing: '0.1em',
+                    })}
+                    size="lg"
+                  >
+                    ${data?.content.totalPrice}
+                  </Text>
+                </Group>
+              </Box>
+              <Accordion
+                styles={(theme) => ({
+                  content: { padding: 0 },
+                  label: {
+                    color: theme.colors.lightGrey,
+                    fontWeight: 300,
+                    lineHeight: 1.6,
+                    letterSpacing: '0.023em',
+                  },
+                })}
+                sx={(theme) => ({ backgroundColor: theme.white })}
+                mt={10}
+              >
+                <Accordion.Item label="Apply promotion code">
+                  <Box sx={{ display: 'flex' }}>
+                    <TextInput
+                      placeholder="Enter code"
+                      radius="xs"
+                      size="md"
+                      required
+                      sx={{ flex: 2 }}
+                      mr={10}
+                    />
+                    <Button
+                      radius="xl"
+                      size="md"
+                      sx={(theme) => ({
+                        flex: 1,
+                        backgroundColor: theme.colors.brownBackground,
+                        transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
+                        '&:hover': {
+                          backgroundColor: theme.colors.hoverBrown,
+                        },
+                      })}
+                    >
+                      Apply
+                    </Button>
+                  </Box>
+                </Accordion.Item>
+              </Accordion>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} mt="xl">
+                <Button
+                  sx={(theme) => ({
+                    backgroundColor: theme.colors.lightGrey,
+                    fontWeight: 400,
+                    padding: matches ? 0 : '0 60px',
+                  })}
+                  radius="xl"
+                  size="lg"
+                  fullWidth={matches}
+                >
+                  <Group spacing={10}>
+                    <Text size="lg" sx={(theme) => ({ fontWeight: 300, fontSize: '17px' })} mt={8}>
+                      Checkout
+                    </Text>
+                    <ArrowNarrowRight size={28} strokeWidth={2} color="white" />
+                  </Group>
+                </Button>
+              </Box>
+            </Box>
+            <Box className={`${classes.cartDetail} ${classes.cartCol}`}>
+              {/* Under the product list */}
+            </Box>
+          </Box>
+        </Box>
+      )}
     </>
   );
 };
