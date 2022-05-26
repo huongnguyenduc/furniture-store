@@ -387,30 +387,28 @@ const Product = () => {
         color: 'yellow',
       });
     } else {
-      try {
-        const addCartResponse = await axiosFetcher(
-          'orders/add-item',
-          'POST',
-          {
-            variantId: selectedVariant?.content.variantId,
-            quantity: 1,
-          },
-          session?.accessToken
-        );
-        if (addCartResponse.status === 200) {
-          showNotification({
-            title: 'Success',
-            message: 'Add product into cart successfully!',
-            color: 'blue',
-          });
-          Router.push('/cart');
-        }
-      } catch (e: any) {
+      const addCartResponse = await axiosFetcher(
+        'orders/add-item',
+        'POST',
+        {
+          variantId: selectedVariant?.content.variantId,
+          quantity: 1,
+        },
+        session?.accessToken
+      );
+      if (addCartResponse.status === 200) {
+        showNotification({
+          title: 'Success',
+          message: 'Add product into cart successfully!',
+          color: 'blue',
+        });
+        Router.push('/cart');
+      } else {
         showNotification({
           title: 'Failure',
           message: (
             <Text>
-              {e.response.data.message}. Maybe you need{' '}
+              {addCartResponse.message}. Maybe you need{' '}
               <Anchor
                 sx={(theme) => ({
                   color: '#4F8DC1',
