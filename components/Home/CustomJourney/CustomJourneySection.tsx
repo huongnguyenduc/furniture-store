@@ -22,7 +22,7 @@ const CustomJourneySection = () => {
           </MediaQuery>
           <Grid>
             {CustomList.map((item) => (
-              <Grid.Col sm={6} lg={3} key={item.title}>
+              <Grid.Col sm={6} lg={3} key={item.title + 'listItem'}>
                 <Group noWrap sx={{ cursor: 'pointer' }}>
                   <ActionIcon
                     sx={(theme) => ({ color: theme.colors.deepGreen })}

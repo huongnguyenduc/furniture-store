@@ -35,7 +35,7 @@ const SeatingCollection = ({ data }: { data: CollectionPage }) => {
                   marginRight:
                     index == data.items.length - 1 && matches ? 'calc((100vw - 1280px) / 2)' : 16,
                 }}
-                key={item.title}
+                key={item.title + item.description}
                 ref={ref}
               >
                 <Image src={item.image} height={280} alt={item.title} mb="md" />

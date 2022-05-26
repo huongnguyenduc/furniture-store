@@ -242,7 +242,7 @@ const RotateImage = ({ image }: { image: string | undefined }) => {
                   position: 'absolute',
                   left: 0,
                 }}
-                key={image}
+                key={image + index}
               >
                 <ImageMantine
                   alt="image"
@@ -277,6 +277,7 @@ const RotateImage = ({ image }: { image: string | undefined }) => {
       <Box className={classes.productImagePreview}>
         {[1, 7, 13, 19, 25].map((item) => (
           <Box
+            key={item + 'image'}
             className={classes.productImagePreviewItem}
             sx={(theme) => ({
               '&:after': { opacity: item === imageIndex ? 0 : 0.03 },

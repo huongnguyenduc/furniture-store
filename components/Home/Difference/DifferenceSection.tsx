@@ -75,7 +75,7 @@ const DifferenceSection = () => {
                 <Group
                   spacing={matches ? 'sm' : 'xl'}
                   mb={matches ? 0 : 'md'}
-                  key={item.title}
+                  key={item.title + item.title}
                   sx={{ cursor: 'pointer' }}
                   onClick={() => {
                     setCategory(item);

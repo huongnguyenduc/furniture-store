@@ -5,6 +5,9 @@ import { createStyles } from '@mantine/core';
 import AccountMenu from './Menu';
 import { menuData } from './MenuData';
 import { useRouter } from 'next/router';
+import { UserResponse } from '../../../pages/account/edit';
+import { useSession } from 'next-auth/react';
+import useSWR from 'swr';
 
 const useStyles = createStyles((theme, _params) => ({
   welcomeContainer: {
@@ -21,6 +24,13 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
   const matchMd = useMediaQuery('(min-width: 992px)', false);
   const { classes } = useStyles();
   const router = useRouter();
+  const { data: session } = useSession();
+  const { data: userData } = useSWR<UserResponse>(() => [
+    `profile/me`,
+    'GET',
+    {},
+    session?.accessToken,
+  ]);
   return (
     <Container size="lg" py={72}>
       <Grid>
@@ -43,7 +53,7 @@ const AccountLayout = ({ children }: { children: React.ReactNode }) => {
               size={matchMd ? 'xl' : 'md'}
               transform="capitalize"
             >
-              Hello Nguyen
+              Hello {userData?.content?.firstName}
             </Text>
           </Box>
           {matchMd ? (

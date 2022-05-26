@@ -80,7 +80,7 @@ const FilterList = ({
                     : undefined,
                 },
               })}
-              key={item.categoryId}
+              key={'' + item.categoryId + item.categoryName}
             >
               <Text sx={(theme) => ({ color: theme.colors.lightGrey, textAlign: 'center' })}>
                 {item.categoryName}

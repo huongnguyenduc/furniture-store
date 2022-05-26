@@ -32,7 +32,7 @@ const CategoryList = () => {
                 marginRight:
                   index == categoryData.length - 1 && matches ? 'calc((100vw - 1280px) / 2)' : 16,
               })}
-              key={item.label}
+              key={item.label + item.image}
               ref={ref}
             >
               <Box

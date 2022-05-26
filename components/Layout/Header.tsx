@@ -49,7 +49,7 @@ function CategoryHeader({
             >
               {subCategoryData.map((item) =>
                 shouldShowSubItemCategory(subCategoryData) ? (
-                  <div key={item.label}>
+                  <div key={item.label + item.categoryId}>
                     <Group
                       align="center"
                       direction="row"
@@ -73,7 +73,7 @@ function CategoryHeader({
                                   )
                                   .join('');
                           Router.push(
-                            `search?q=${''}&category=${item.categoryId}${subCategoriesUrl}`
+                            `/search?q=${''}&category=${item.categoryId}${subCategoriesUrl}`
                           );
                         }
                       }}
@@ -104,7 +104,7 @@ function CategoryHeader({
                         onClick={() => {
                           if (typeof subItem !== 'string') {
                             Router.push(
-                              `search?q=${''}&category=${item.categoryId}&subCategories=${
+                              `/search?q=${''}&category=${item.categoryId}&subCategories=${
                                 subItem.categoryId
                               }`
                             );
@@ -117,6 +117,7 @@ function CategoryHeader({
                   </div>
                 ) : (
                   <Box
+                    key={item.label + item.image + item.image}
                     sx={{
                       transform: 'scale(0.9)',
                       '&:hover': { transform: 'scale(0.95)' },
@@ -177,7 +178,7 @@ function CategoryHeader({
                       pr="md"
                       onMouseEnter={() => setSubCategoryData(item.items)}
                       sx={{ cursor: 'pointer' }}
-                      key={item.label}
+                      key={item.label + item.image}
                     >
                       {item.label}
                     </Text>

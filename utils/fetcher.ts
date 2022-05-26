@@ -9,7 +9,9 @@ export function axiosFetcher(endpoint = '/', method = 'GET', body = {}, cookie: 
       'Content-Type': 'application/json',
       Authorization: cookie ? `Bearer ${cookie}` : cookie,
     },
-  }).then((res) => res.data);
+  })
+    .then((res) => res.data)
+    .catch((error) => error.response.data);
 }
 
 export const fetcher = (url: string) => fetch(url).then((res) => res.json());

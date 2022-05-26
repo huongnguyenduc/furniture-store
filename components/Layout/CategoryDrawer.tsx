@@ -3,6 +3,7 @@ import { Accordion, Drawer, Text, ScrollArea, Group, Image } from '@mantine/core
 
 import { ChevronRight } from 'tabler-icons-react';
 import { categoryList } from './CategoryList';
+import Router from 'next/router';
 
 interface AccordionItemProps {
   label: string;
@@ -36,9 +37,9 @@ export default function CategoryDrawer({
       <ScrollArea style={{ height: `88vh` }} offsetScrollbars>
         <Accordion initialItem={-1}>
           {categoryList.map((item) => (
-            <Accordion.Item label={<AccordionLabel {...item} />} key={item.label}>
+            <Accordion.Item label={<AccordionLabel {...item} />} key={item.label + 'parent'}>
               {item.items.map((item) => (
-                <Accordion initialItem={-1} key={item.label}>
+                <Accordion initialItem={-1} key={item.label + 'accordion'}>
                   <Accordion.Item
                     label={<AccordionLabel {...item} />}
                     key={item.label}
@@ -48,7 +49,7 @@ export default function CategoryDrawer({
                     disableIconRotation={!item.items.length}
                     iconPosition={!item.image || !item.items.length ? 'right' : 'left'}
                   >
-                    {item.items?.map((item) => (
+                    {item.items?.map((subItem) => (
                       <Text
                         pb={12}
                         sx={{
@@ -58,9 +59,18 @@ export default function CategoryDrawer({
                           transition: 'transform 400ms cubic-bezier(0.4, 0, 0.2, 1)',
                           cursor: 'pointer',
                         }}
-                        key={item}
+                        key={`${subItem.toString()}-subheader`}
+                        onClick={() => {
+                          if (typeof subItem !== 'string') {
+                            Router.push(
+                              `search?q=${''}&category=${item.categoryId}&subCategories=${
+                                subItem.categoryId
+                              }`
+                            );
+                          }
+                        }}
                       >
-                        {item}
+                        {typeof subItem === 'string' ? subItem : subItem.label}
                       </Text>
                     ))}
                   </Accordion.Item>

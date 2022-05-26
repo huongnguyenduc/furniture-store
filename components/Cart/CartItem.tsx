@@ -108,7 +108,7 @@ const CartItem = ({ data, update }: { data: CartItem; update: KeyedMutator<CartR
               {data.variant.productName}
             </Text>
             {data.variant.options.map((item) => (
-              <Box mt={10}>
+              <Box mt={10} key={item.optionValue + item.optionImage}>
                 <Text sx={(theme) => ({ color: theme.colors.mediumGrey })}>{item.optionName}</Text>
                 <Group mt={4}>
                   <Image width={20} height={20} src={item.optionImage} />

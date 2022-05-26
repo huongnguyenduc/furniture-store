@@ -7,6 +7,8 @@ import {
   Group,
   TextInput,
   MediaQuery,
+  Tooltip,
+  Anchor,
 } from '@mantine/core';
 import { createStyles } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
@@ -15,6 +17,11 @@ import { ArrowNarrowRight } from 'tabler-icons-react';
 import useSWR from 'swr';
 import { useSession } from 'next-auth/react';
 import { Variant } from './product';
+import { axiosFetcher } from '../utils/fetcher';
+import React from 'react';
+import { showNotification } from '@mantine/notifications';
+import Router from 'next/router';
+import { UserResponse } from './account/edit';
 
 const useStyles = createStyles((theme, _params) => ({
   titleContainer: {
@@ -165,9 +172,16 @@ export interface CartItem {
   variant: CartVariant;
   quantity: number;
 }
-interface Cart {
+interface Voucher {
+  voucherId: number;
+  voucherName: string;
+  voucherDesc: string;
+  voucherValue: number;
+}
+export interface Cart {
   orderId: number;
-  voucher: string;
+  orderStatus: string;
+  voucher: Voucher;
   totalPrice: number;
   orderDetails: CartItem[];
 }
@@ -189,6 +203,103 @@ const ShoppingCart = () => {
     {},
     session?.accessToken,
   ]);
+  const { data: userData } = useSWR<UserResponse>(
+    () => [`profile/me`, 'GET', {}, session?.accessToken],
+    axiosFetcher
+  );
+  const addVoucher = async (id: string) => {
+    const addVoucherResponse = await axiosFetcher(
+      'orders/add-voucher',
+      'POST',
+      id,
+      session?.accessToken
+    );
+    if (addVoucherResponse.status === 200) {
+      showNotification({
+        title: 'Success',
+        message: 'Add voucher from cart successfully!',
+        color: 'blue',
+      });
+      mutate(addVoucherResponse);
+    } else {
+      showNotification({
+        title: 'Failure',
+        message: addVoucherResponse.errors,
+        color: 'red',
+      });
+    }
+  };
+  const removeVoucher = async () => {
+    const removeVoucherResponse = await axiosFetcher(
+      'orders/remove-voucher',
+      'POST',
+      {},
+      session?.accessToken
+    );
+    if (removeVoucherResponse.status === 200) {
+      showNotification({
+        title: 'Success',
+        message: 'Remove voucher from cart successfully!',
+        color: 'blue',
+      });
+      mutate(removeVoucherResponse);
+    } else {
+      showNotification({
+        title: 'Failure',
+        message: removeVoucherResponse.errors,
+        color: 'red',
+      });
+    }
+  };
+  const checkoutCart = async () => {
+    if (!(userData?.content.address && userData?.content.phoneNo)) {
+      showNotification({
+        title: 'Missing information',
+        message: (
+          <Text>
+            Please fill your phone number &#38; address{' '}
+            <Anchor
+              sx={(theme) => ({
+                color: '#4F8DC1',
+                transition: 'color 400ms cubic-bezier(0.4, 0, 0.2, 1)',
+                '&:hover': {
+                  color: '#6FB3F2',
+                },
+              })}
+              component="a"
+              onClick={() => Router.push('/account/edit')}
+            >
+              here
+            </Anchor>{' '}
+            before checkout!
+          </Text>
+        ),
+        color: 'blue',
+      });
+    } else {
+      const checkoutCartResponse = await axiosFetcher(
+        'orders/user/checkout',
+        'GET',
+        {},
+        session?.accessToken
+      );
+      if (checkoutCartResponse.status === 200) {
+        showNotification({
+          title: 'Success',
+          message: 'Checkout cart successfully!',
+          color: 'blue',
+        });
+        Router.push('/account/order/history');
+      } else {
+        showNotification({
+          title: 'Failure',
+          message: checkoutCartResponse.errors,
+          color: 'red',
+        });
+      }
+    }
+  };
+  const [voucherValue, setVoucherValue] = React.useState('');
   return (
     <>
       <Container size={1280}>
@@ -216,7 +327,11 @@ const ShoppingCart = () => {
             <Box className={`${classes.cartImage} ${classes.cartCol}`}>
               <Box className={classes.cartList}>
                 {data?.content.orderDetails.map((item) => (
-                  <CartItem data={item} update={mutate} />
+                  <CartItem
+                    data={item}
+                    update={mutate}
+                    key={item.variant.productName + 'cartItem'}
+                  />
                 ))}
               </Box>
             </Box>
@@ -263,6 +378,51 @@ const ShoppingCart = () => {
                     ${data?.content.totalPrice}
                   </Text>
                 </Group>
+                {data.content.voucher ? (
+                  <Tooltip
+                    wrapLines
+                    withArrow
+                    sx={{ width: '100%' }}
+                    transition="fade"
+                    transitionDuration={200}
+                    position="bottom"
+                    placement="start"
+                    label={
+                      data.content.voucher.voucherName + ' - ' + data.content.voucher.voucherDesc
+                    }
+                  >
+                    <Group
+                      position="apart"
+                      p={15}
+                      sx={(theme) => ({
+                        borderBottom: `1px solid ${theme.colors.lightBorder}`,
+                      })}
+                    >
+                      <Text
+                        sx={(theme) => ({
+                          color: theme.colors.lightGrey,
+                          fontWeight: 300,
+                          lineHeight: 1.6,
+                          letterSpacing: '0.023em',
+                        })}
+                      >
+                        Voucher
+                      </Text>
+                      <Text
+                        sx={(theme) => ({
+                          color: theme.colors.lightGrey,
+                          fontWeight: 300,
+                          lineHeight: 1.6,
+                          letterSpacing: '0.023em',
+                        })}
+                      >
+                        ${(data?.content.totalPrice * data.content.voucher.voucherValue) / 100}
+                      </Text>
+                    </Group>
+                  </Tooltip>
+                ) : (
+                  <></>
+                )}
                 <Group
                   position="apart"
                   p={15}
@@ -318,50 +478,77 @@ const ShoppingCart = () => {
                     })}
                     size="lg"
                   >
-                    ${data?.content.totalPrice}
+                    $
+                    {data?.content.totalPrice -
+                      (data.content.voucher
+                        ? (data?.content.totalPrice * data.content.voucher.voucherValue) / 100
+                        : 0)}
                   </Text>
                 </Group>
               </Box>
-              <Accordion
-                styles={(theme) => ({
-                  content: { padding: 0 },
-                  label: {
-                    color: theme.colors.lightGrey,
-                    fontWeight: 300,
-                    lineHeight: 1.6,
-                    letterSpacing: '0.023em',
-                  },
-                })}
-                sx={(theme) => ({ backgroundColor: theme.white })}
-                mt={10}
-              >
-                <Accordion.Item label="Apply promotion code">
-                  <Box sx={{ display: 'flex' }}>
-                    <TextInput
-                      placeholder="Enter code"
-                      radius="xs"
-                      size="md"
-                      required
-                      sx={{ flex: 2 }}
-                      mr={10}
-                    />
-                    <Button
-                      radius="xl"
-                      size="md"
-                      sx={(theme) => ({
-                        flex: 1,
-                        backgroundColor: theme.colors.brownBackground,
-                        transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
-                        '&:hover': {
-                          backgroundColor: theme.colors.hoverBrown,
-                        },
-                      })}
-                    >
-                      Apply
-                    </Button>
-                  </Box>
-                </Accordion.Item>
-              </Accordion>
+              {data.content.voucher ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <Button
+                    radius="xl"
+                    size="md"
+                    sx={(theme) => ({
+                      flex: 1,
+                      backgroundColor: theme.colors.brownBackground,
+                      transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
+                      '&:hover': {
+                        backgroundColor: theme.colors.hoverBrown,
+                      },
+                    })}
+                    onClick={removeVoucher}
+                  >
+                    Remove voucher
+                  </Button>
+                </Box>
+              ) : (
+                <Accordion
+                  styles={(theme) => ({
+                    content: { padding: 0 },
+                    label: {
+                      color: theme.colors.lightGrey,
+                      fontWeight: 300,
+                      lineHeight: 1.6,
+                      letterSpacing: '0.023em',
+                    },
+                  })}
+                  sx={(theme) => ({ backgroundColor: theme.white })}
+                  mt={10}
+                >
+                  <Accordion.Item label="Apply promotion code">
+                    <Box sx={{ display: 'flex' }}>
+                      <TextInput
+                        placeholder="Enter code"
+                        radius="xs"
+                        size="md"
+                        required
+                        sx={{ flex: 2 }}
+                        mr={10}
+                        value={voucherValue}
+                        onChange={(e) => setVoucherValue(e.target.value)}
+                      />
+                      <Button
+                        radius="xl"
+                        size="md"
+                        sx={(theme) => ({
+                          flex: 1,
+                          backgroundColor: theme.colors.brownBackground,
+                          transition: 'all 400ms cubic-bezier(0.4, 0, 0.2, 1)',
+                          '&:hover': {
+                            backgroundColor: theme.colors.hoverBrown,
+                          },
+                        })}
+                        onClick={() => addVoucher(voucherValue)}
+                      >
+                        Apply
+                      </Button>
+                    </Box>
+                  </Accordion.Item>
+                </Accordion>
+              )}
               <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }} mt="xl">
                 <Button
                   sx={(theme) => ({
@@ -372,6 +559,7 @@ const ShoppingCart = () => {
                   radius="xl"
                   size="lg"
                   fullWidth={matches}
+                  onClick={checkoutCart}
                 >
                   <Group spacing={10}>
                     <Text size="lg" sx={(theme) => ({ fontWeight: 300, fontSize: '17px' })} mt={8}>

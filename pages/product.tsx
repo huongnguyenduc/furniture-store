@@ -377,6 +377,7 @@ const Product = () => {
                 },
               })}
               component="a"
+              onClick={() => Router.push('/login')}
             >
               Login now
             </Anchor>{' '}
@@ -386,27 +387,46 @@ const Product = () => {
         color: 'yellow',
       });
     } else {
-      const addCartResponse = await axiosFetcher(
-        'orders/add-item',
-        'POST',
-        {
-          variantId: selectedVariant?.content.variantId,
-          quantity: 1,
-        },
-        session?.accessToken
-      );
-
-      if (addCartResponse.status === 200) {
-        showNotification({
-          title: 'Success',
-          message: 'Add product into cart successfully!',
-          color: 'blue',
-        });
-        Router.push('/cart');
-      } else {
+      try {
+        const addCartResponse = await axiosFetcher(
+          'orders/add-item',
+          'POST',
+          {
+            variantId: selectedVariant?.content.variantId,
+            quantity: 1,
+          },
+          session?.accessToken
+        );
+        if (addCartResponse.status === 200) {
+          showNotification({
+            title: 'Success',
+            message: 'Add product into cart successfully!',
+            color: 'blue',
+          });
+          Router.push('/cart');
+        }
+      } catch (e: any) {
         showNotification({
           title: 'Failure',
-          message: addCartResponse.message,
+          message: (
+            <Text>
+              {e.response.data.message}. Maybe you need{' '}
+              <Anchor
+                sx={(theme) => ({
+                  color: '#4F8DC1',
+                  transition: 'color 400ms cubic-bezier(0.4, 0, 0.2, 1)',
+                  '&:hover': {
+                    color: '#6FB3F2',
+                  },
+                })}
+                component="a"
+                onClick={() => Router.push('/login')}
+              >
+                re-login
+              </Anchor>{' '}
+              to continue your shopping!
+            </Text>
+          ),
           color: 'red',
         });
       }
@@ -481,6 +501,7 @@ const Product = () => {
                       label={
                         <AccordionLabel index={index + 1} title={`Choose ${optionTypeName}`} />
                       }
+                      key={'' + optionTypeName + index}
                     >
                       <ScrollContainer
                         style={{
@@ -497,6 +518,7 @@ const Product = () => {
                                 )
                               );
                             }}
+                            key={item.optionValue}
                           >
                             <OptionItem
                               data={item}

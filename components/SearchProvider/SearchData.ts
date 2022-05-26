@@ -5,7 +5,7 @@ export const searchData = (query: string) => [
     id: 'search-with-keyword',
     title: 'Enter to search ' + (query ? '"' + query + '"' : ''),
     onTrigger: () => {
-      Router.push(`search?q=${query}`);
+      Router.push(`/search?q=${query}`);
     },
     keyword: query,
   },
