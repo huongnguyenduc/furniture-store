@@ -183,6 +183,7 @@ export interface Cart {
   orderStatus: string;
   voucher: Voucher;
   totalPrice: number;
+  discount: number;
   orderDetails: CartItem[];
 }
 
@@ -207,11 +208,11 @@ const ShoppingCart = () => {
     () => [`profile/me`, 'GET', {}, session?.accessToken],
     axiosFetcher
   );
-  const addVoucher = async (id: string) => {
+  const addVoucher = async (name: string) => {
     const addVoucherResponse = await axiosFetcher(
       'orders/add-voucher',
       'POST',
-      id,
+      { voucherName: name },
       session?.accessToken
     );
     if (addVoucherResponse.status === 200) {
@@ -416,7 +417,7 @@ const ShoppingCart = () => {
                           letterSpacing: '0.023em',
                         })}
                       >
-                        ${(data?.content.totalPrice * data.content.voucher.voucherValue) / 100}
+                        ${data?.content.discount}
                       </Text>
                     </Group>
                   </Tooltip>
@@ -478,11 +479,7 @@ const ShoppingCart = () => {
                     })}
                     size="lg"
                   >
-                    $
-                    {data?.content.totalPrice -
-                      (data.content.voucher
-                        ? (data?.content.totalPrice * data.content.voucher.voucherValue) / 100
-                        : 0)}
+                    ${data?.content.totalPrice - data?.content.discount}
                   </Text>
                 </Group>
               </Box>
