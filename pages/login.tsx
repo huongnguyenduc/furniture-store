@@ -12,13 +12,15 @@ import {
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import Link from 'next/link';
-import Router from 'next/router';
+import Router, { useRouter } from 'next/router';
 import React from 'react';
 import { signIn, getCsrfToken, SignInResponse } from 'next-auth/react';
 import { GetServerSideProps } from 'next';
 import { useForm } from '@mantine/form';
 
 const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
+  const router = useRouter();
+  const { referrer, id } = router.query;
   const matchMd = useMediaQuery('(min-width: 992px)', false);
   const matchSm = useMediaQuery('(min-width: 768px)', false);
   const form = useForm({
@@ -49,7 +51,10 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
       } else {
         setFormError(null);
       }
-      if (url) Router.push(url);
+      if (url) {
+        if (referrer && id) Router.push(`/${referrer}?id=${id}`);
+        else Router.push(url);
+      }
     }
   };
   return (

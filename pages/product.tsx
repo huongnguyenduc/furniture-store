@@ -378,7 +378,7 @@ const Product = () => {
                 },
               })}
               component="a"
-              onClick={() => Router.push('/login')}
+              onClick={() => Router.push(`/login?referrer=product&id=${data?.content.productId}`)}
             >
               Login now
             </Anchor>{' '}
@@ -425,7 +425,7 @@ const Product = () => {
                   },
                 })}
                 component="a"
-                onClick={() => Router.push('/login')}
+                onClick={() => Router.push(`/login?referrer=product&id=${data?.content.productId}`)}
               >
                 re-login
               </Anchor>{' '}

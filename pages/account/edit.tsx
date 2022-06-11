@@ -7,6 +7,7 @@ import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
 import { axiosFetcher } from '../../utils/fetcher';
 import { showNotification } from '@mantine/notifications';
+import { useRouter } from 'next/router';
 
 const useStyles = createStyles((theme, _params) => ({
   sectionContainer: {
@@ -37,6 +38,8 @@ export interface UserResponse {
 }
 
 const EditAccount = () => {
+  const router = useRouter();
+  const { referrer } = router.query;
   const { data: session } = useSession();
   const { data, error } = useSWR<UserResponse>(
     () => [`profile/me`, 'GET', {}, session?.accessToken],
@@ -148,6 +151,9 @@ const EditAccount = () => {
                       message: 'Update user profile successfully!',
                       color: 'blue',
                     });
+                    if (referrer) {
+                      router.push(`/${referrer}`);
+                    }
                   } else {
                     setFormError(updateUserResponse.message);
                   }

@@ -268,7 +268,7 @@ const ShoppingCart = () => {
                 },
               })}
               component="a"
-              onClick={() => Router.push('/account/edit')}
+              onClick={() => Router.push(`/account/edit?referrer=cart`)}
             >
               here
             </Anchor>{' '}
