@@ -50,18 +50,10 @@ const OrderHistory = () => {
           {item.orderDetails.map((orderItem) => (
             <OrderItem data={orderItem} />
           ))}
-          {item.voucher ? (
-            <Text mb="xs">Voucher: ${(item.totalPrice * item.voucher.voucherValue) / 100}</Text>
-          ) : (
-            <></>
-          )}
+          {item.discount ? <Text mb="xs">Voucher: ${item.discount}</Text> : <></>}
           <Group>
             <Text>Total price: </Text>
-            <Text size="lg">
-              $
-              {item.totalPrice -
-                (item.voucher ? (item.totalPrice * item.voucher.voucherValue) / 100 : 0)}
-            </Text>
+            <Text size="lg">${item.totalPrice - (item.discount ? item.discount : 0)}</Text>
           </Group>
         </Box>
       ))}
