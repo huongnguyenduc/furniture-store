@@ -478,7 +478,12 @@ const Product = () => {
             </Text>
           </Box>
           <Box className={`${classes.productImage} ${classes.productCol}`} draggable={false}>
-            <RotateImage image={selectedVariant?.content.image} />
+            <RotateImage
+              image={selectedVariant?.content.image}
+              variants={data?.content.variants}
+              selectedVariant={selectedVariant?.content}
+              setSelectedOptions={setSelectedOptions}
+            />
           </Box>
           <Box className={classes.productColCart}>
             <Box className={classes.productTitle} pt="xl" mt="xl">

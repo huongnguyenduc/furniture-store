@@ -1,6 +1,8 @@
 import React, { Dispatch, SetStateAction } from 'react';
 import { Box, Image as ImageMantine, Loader } from '@mantine/core';
 import { createStyles } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
+import { Variant, Option } from '../../pages/product';
 
 const useStyles = createStyles((theme, _params) => ({
   productImageRotate: {
@@ -20,7 +22,7 @@ const useStyles = createStyles((theme, _params) => ({
     },
     [`@media (min-width: ${theme.breakpoints.sm}px)`]: {
       // bottom: '72px',
-      bottom: '180px',
+      bottom: '240px',
       width: '382px',
       height: '38px',
     },
@@ -54,7 +56,7 @@ const useStyles = createStyles((theme, _params) => ({
   productImagePreview: {
     display: 'flex',
     position: 'absolute',
-    bottom: 0,
+    bottom: '70px',
     height: '60px',
     paddingLeft: '10px',
     paddingRight: '10px',
@@ -63,9 +65,10 @@ const useStyles = createStyles((theme, _params) => ({
     alignItems: 'flex-end',
     margin: '0 auto',
     [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
-      maxWidth: '335px',
+      maxWidth: '380px',
       transform: 'translateX(-50%)',
       left: '50%',
+      bottom: '120px',
     },
     [`@media (min-width: ${theme.breakpoints.sm}px)`]: {
       height: '140px',
@@ -75,6 +78,35 @@ const useStyles = createStyles((theme, _params) => ({
       border: `1px solid ${theme.colors.lightBorder}`,
       borderRadius: '5px',
       padding: '20px 0',
+    },
+  },
+  productImagePreviewSub: {
+    display: 'flex',
+    position: 'absolute',
+    bottom: 0,
+    height: '50px',
+    paddingLeft: '10px',
+    paddingRight: '10px',
+    width: '100%',
+    // justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    margin: '0 auto',
+    [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
+      maxWidth: '435px',
+      transform: 'translateX(-50%)',
+      left: '50%',
+      height: '95px',
+      overflowX: 'scroll',
+      alignItems: 'center',
+    },
+    [`@media (min-width: ${theme.breakpoints.sm}px)`]: {
+      height: '60px',
+      width: '580px',
+      left: '50%',
+      marginLeft: '-290px',
+      border: `1px solid ${theme.colors.lightBorder}`,
+      borderRadius: '5px',
+      padding: '5px 0',
     },
   },
   productImagePreviewItem: {
@@ -110,7 +142,55 @@ const useStyles = createStyles((theme, _params) => ({
       transition: 'opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)',
     },
   },
+  productImagePreviewItemSub: {
+    width: '150px',
+    borderRadius: '4px',
+    position: 'relative',
+    cursor: 'pointer',
+    border: '1px solid rgba(21, 21, 21, 0.03)',
+    transition: 'border-color 200ms cubic-bezier(0.4, 0, 0.2, 1)',
+    padding: 0,
+    height: 'auto',
+    lineHeight: 1,
+    margin: 0,
+    [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
+      minWidth: '150px',
+    },
+    [`@media (min-width: ${theme.breakpoints.sm}px)`]: {
+      margin: '0 5px',
+      width: '150px',
+      height: '50px',
+      lineHeight: '100px',
+    },
+    '&:after': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      background: theme.colors.mediumGrey,
+      borderRadius: '3px',
+      opacity: 0.03,
+      transition: 'opacity 200ms cubic-bezier(0.4, 0, 0.2, 1)',
+    },
+  },
   productImagePreviewItemImg: {
+    width: '100%',
+    maxWidth: '100%',
+    margin: '0 auto',
+    display: 'block',
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%,-50%)',
+    [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
+      left: 0,
+      right: 0,
+      transform: 'translate(0, -50%)',
+    },
+  },
+  productImagePreviewItemImgSub: {
     width: '100%',
     maxWidth: '100%',
     margin: '0 auto',
@@ -180,7 +260,17 @@ async function rotateImagePreview(
   }
 }
 
-const RotateImage = ({ image }: { image: string | undefined }) => {
+const RotateImage = ({
+  image,
+  variants,
+  selectedVariant,
+  setSelectedOptions,
+}: {
+  image: string | undefined;
+  variants: Variant[] | undefined;
+  selectedVariant: Variant | undefined;
+  setSelectedOptions: React.Dispatch<React.SetStateAction<Option[]>>;
+}) => {
   const [imageIndex, setImageIndex] = React.useState(1);
   const [changeImagePosition, setChangeImagePosition] = React.useState(0);
 
@@ -193,15 +283,18 @@ const RotateImage = ({ image }: { image: string | undefined }) => {
     };
   }, []);
 
-  const [isDragging, setIsDragging] = React.useState(false);
-
   const onImageDragStart = (e: any) => {
     e.dataTransfer.setDragImage(dragImg, 0, 0);
-    setIsDragging(true);
   };
-  const onImageDragEnd = () => {
-    setIsDragging(false);
-  };
+  const onImageDragEnd = () => {};
+
+  const matchLg = useMediaQuery('(min-width: 1200px)', false);
+  const matchMd = useMediaQuery('(min-width: 992px)', false);
+  const matchSm = useMediaQuery('(min-width: 768px)', false);
+  const matchXs = useMediaQuery('(min-width: 576px)', false);
+  const matchXs1 = useMediaQuery('(min-width: 476px)', false);
+  const matchXs2 = useMediaQuery('(min-width: 376px)', false);
+  const matchXs3 = useMediaQuery('(min-width: 276px)', false);
 
   const onImageDragging = (e: any) => {
     e = e || window?.event;
@@ -241,6 +334,10 @@ const RotateImage = ({ image }: { image: string | undefined }) => {
                   opacity: index + 1 === imageIndex ? 1 : 0.001,
                   position: 'absolute',
                   left: 0,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  width: '100%',
+                  maxHeight: '450px',
                 }}
                 key={image + index}
               >
@@ -250,6 +347,24 @@ const RotateImage = ({ image }: { image: string | undefined }) => {
                   style={{
                     userSelect: 'none',
                   }}
+                  height={
+                    matchLg
+                      ? 450
+                      : matchMd
+                      ? 320
+                      : matchSm
+                      ? 450
+                      : matchXs
+                      ? 350
+                      : matchXs1
+                      ? 280
+                      : matchXs2
+                      ? 200
+                      : matchXs3
+                      ? 190
+                      : 150
+                  }
+                  fit="contain"
                 />
               </li>
             ))}
@@ -270,28 +385,95 @@ const RotateImage = ({ image }: { image: string | undefined }) => {
           }}
         />
       )}
-      <ImageMantine
-        className={classes.productImageRotate}
-        src="https://media.interiordefine.com/skin/frontend/interiordefine/default/images/cylindo-arrows-desk.svg"
-      />
-      <Box className={classes.productImagePreview}>
-        {[1, 7, 13, 19, 25].map((item) => (
+      {new RegExp('frames/./', 'g').test(image ? image : '') ? (
+        <>
+          {matchSm ? (
+            <ImageMantine
+              className={classes.productImageRotate}
+              src="https://media.interiordefine.com/skin/frontend/interiordefine/default/images/cylindo-arrows-desk.svg"
+            />
+          ) : (
+            <></>
+          )}
+          <Box className={classes.productImagePreview}>
+            {[1, 7, 13, 19, 25].map((item) => (
+              <Box
+                key={item + 'image'}
+                className={classes.productImagePreviewItem}
+                sx={(theme) => ({
+                  '&:after': { opacity: item === imageIndex ? 0 : 0.03 },
+                  borderColor:
+                    item === imageIndex ? theme.colors.brownBackground : 'rgba(21, 21, 21, 0.03)',
+                })}
+                onClick={() => {
+                  rotateImagePreview(imageIndex, item, setImageIndex);
+                }}
+              >
+                <ImageMantine
+                  src={image?.replace(new RegExp('frames/./', 'g'), `frames/${item}/`)}
+                  className={classes.productImagePreviewItemImg}
+                  key={item}
+                />
+              </Box>
+            ))}
+          </Box>
+        </>
+      ) : (
+        <></>
+      )}
+      <Box className={classes.productImagePreviewSub}>
+        {variants?.map((item) => (
           <Box
-            key={item + 'image'}
-            className={classes.productImagePreviewItem}
+            key={item.image + 'image2'}
+            className={classes.productImagePreviewItemSub}
             sx={(theme) => ({
-              '&:after': { opacity: item === imageIndex ? 0 : 0.03 },
+              '&:after': { opacity: item.sku === selectedVariant?.sku ? 0 : 0.03 },
               borderColor:
-                item === imageIndex ? theme.colors.brownBackground : 'rgba(21, 21, 21, 0.03)',
+                item.sku === selectedVariant?.sku
+                  ? theme.colors.brownBackground
+                  : 'rgba(21, 21, 21, 0.03)',
+              height: matchLg
+                ? '48px'
+                : matchMd
+                ? '47px'
+                : matchSm
+                ? '46px'
+                : matchXs
+                ? '45px'
+                : matchXs1
+                ? '44px'
+                : matchXs2
+                ? '43px'
+                : matchXs3
+                ? '42px'
+                : '41px',
             })}
             onClick={() => {
-              rotateImagePreview(imageIndex, item, setImageIndex);
+              setSelectedOptions(item.options);
             }}
           >
             <ImageMantine
-              src={image?.replace(new RegExp('frames/./', 'g'), `frames/${item}/`)}
-              className={classes.productImagePreviewItemImg}
-              key={item}
+              src={item.image}
+              className={classes.productImagePreviewItemImgSub}
+              key={item.sku}
+              fit="contain"
+              height={
+                matchLg
+                  ? 45
+                  : matchMd
+                  ? 44
+                  : matchSm
+                  ? 43
+                  : matchXs
+                  ? 42
+                  : matchXs1
+                  ? 41
+                  : matchXs2
+                  ? 40
+                  : matchXs3
+                  ? 39
+                  : 38
+              }
             />
           </Box>
         ))}
