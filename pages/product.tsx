@@ -301,6 +301,7 @@ export interface Variant {
   image: string;
   options: Option[];
   variantId: number;
+  quantity: number;
 }
 interface Product {
   brandId: number;
@@ -386,6 +387,12 @@ const Product = () => {
         ),
         color: 'yellow',
       });
+    } else if (selectedVariant?.content.quantity === 0) {
+      showNotification({
+        title: 'Out of stock!',
+        message: <Text>You can choose another variants instead.</Text>,
+        color: 'yellow',
+      });
     } else {
       const addCartResponse = await axiosFetcher(
         'orders/add-item',
@@ -403,7 +410,7 @@ const Product = () => {
           color: 'blue',
         });
         Router.push('/cart');
-      } else {
+      } else if (addCartResponse.status === 403) {
         showNotification({
           title: 'Failure',
           message: (
@@ -425,6 +432,12 @@ const Product = () => {
               to continue your shopping!
             </Text>
           ),
+          color: 'red',
+        });
+      } else {
+        showNotification({
+          title: 'Failure',
+          message: <Text>{addCartResponse.message}</Text>,
           color: 'red',
         });
       }
