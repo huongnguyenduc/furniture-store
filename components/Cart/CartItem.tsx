@@ -1,4 +1,5 @@
 import { Box, Grid, Group, Image, Text } from '@mantine/core';
+import { showNotification } from '@mantine/notifications';
 import { useSession } from 'next-auth/react';
 import Router from 'next/router';
 import React from 'react';
@@ -9,16 +10,32 @@ import { axiosFetcher } from '../../utils/fetcher';
 const CartItem = ({ data, update }: { data: CartItem; update: KeyedMutator<CartResponse> }) => {
   const { data: session } = useSession();
   const addItemQuantity = async () => {
-    const addItemResponse = await axiosFetcher(
-      'orders/add-item',
-      'POST',
-      {
-        variantId: data.variant.variantId,
-        quantity: 1 + data.quantity,
-      },
-      session?.accessToken
-    );
-    update(addItemResponse);
+    if (data.variant.quantity === data.quantity) {
+      showNotification({
+        title: 'Maximum quantity!',
+        message: <Text>This product gets the highest quantity</Text>,
+        color: 'yellow',
+      });
+    } else {
+      const addItemResponse = await axiosFetcher(
+        'orders/add-item',
+        'POST',
+        {
+          variantId: data.variant.variantId,
+          quantity: 1 + data.quantity,
+        },
+        session?.accessToken
+      );
+      if (addItemResponse.status === 200) {
+        update(addItemResponse);
+      } else {
+        showNotification({
+          title: 'Failure',
+          message: <Text>{addItemResponse.message}</Text>,
+          color: 'red',
+        });
+      }
+    }
   };
 
   const minusItemQuantity = async () => {
@@ -32,7 +49,16 @@ const CartItem = ({ data, update }: { data: CartItem; update: KeyedMutator<CartR
         },
         session?.accessToken
       );
-      update(minusItemResponse);
+
+      if (minusItemResponse.status === 200) {
+        update(minusItemResponse);
+      } else {
+        showNotification({
+          title: 'Failure',
+          message: <Text>{minusItemResponse.message}</Text>,
+          color: 'red',
+        });
+      }
     }
   };
 
@@ -43,7 +69,15 @@ const CartItem = ({ data, update }: { data: CartItem; update: KeyedMutator<CartR
       data.variant.variantId,
       session?.accessToken
     );
-    update(removeItemResponse);
+    if (removeItemResponse.status === 200) {
+      update(removeItemResponse);
+    } else {
+      showNotification({
+        title: 'Failure',
+        message: <Text>{removeItemResponse.message}</Text>,
+        color: 'red',
+      });
+    }
   };
   return (
     <Box
