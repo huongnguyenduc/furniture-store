@@ -124,6 +124,25 @@ function CategoryHeader({
                       transition: 'transform 400ms cubic-bezier(0.4, 0, 0.2, 1)',
                       cursor: 'pointer',
                     }}
+                    onClick={() => {
+                      if (item.categoryId) {
+                        const subCategoriesUrl =
+                          item.items.length === 0
+                            ? `&subCategories=${item.categoryId}`
+                            : typeof item.items[0] === 'string'
+                            ? ``
+                            : item.items
+                                .map((subItem) =>
+                                  typeof subItem === 'string'
+                                    ? ''
+                                    : `&subCategories=${subItem.categoryId}`
+                                )
+                                .join('');
+                        Router.push(
+                          `/search?q=${''}&category=${item.categoryId}${subCategoriesUrl}`
+                        );
+                      }
+                    }}
                   >
                     <Image src={item.image} alt={item.label} pb="lg" height={195} fit="contain" />
                     <Text

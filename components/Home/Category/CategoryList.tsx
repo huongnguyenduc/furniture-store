@@ -2,6 +2,7 @@ import { Box, Text, Image } from '@mantine/core';
 import { categoryData } from './CategoryData';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import { useHover, useMediaQuery } from '@mantine/hooks';
+import Router from 'next/router';
 
 const CategoryList = () => {
   const matches = useMediaQuery('(min-width: 1280px)', false);
@@ -34,6 +35,14 @@ const CategoryList = () => {
               })}
               key={item.label + item.image}
               ref={ref}
+              onClick={() => {
+                if (item.categoryId) {
+                  const subCategoriesUrl = item.items
+                    ? item.items.map((subItem) => `&subCategories=${subItem}`).join('')
+                    : '';
+                  Router.push(`/search?q=${''}&category=${item.categoryId}${subCategoriesUrl}`);
+                }
+              }}
             >
               <Box
                 p="lg"

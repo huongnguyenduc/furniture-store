@@ -74,6 +74,15 @@ const Search = () => {
         : [parseInt(subCategories)]
       : []
   );
+  React.useEffect(() => {
+    setCategoryIdList((prevCategories) =>
+      subCategories
+        ? Array.isArray(subCategories)
+          ? subCategories.map((id) => parseInt(id))
+          : [parseInt(subCategories)]
+        : prevCategories
+    );
+  }, [subCategories]);
   const categoryListUrl =
     categoryIdList.length === 0 ? '' : categoryIdList.map((id) => `&categoryId=${id}`).join('');
   const { data, error, size, setSize } = useSWRInfinite<SearchPage>((index) => [
@@ -94,7 +103,6 @@ const Search = () => {
       window.removeEventListener('scroll', reachEndCallback, false);
     };
   }, [hasMore]);
-  console.log('mew', hasMore);
   function reachEnd() {
     if (window.innerHeight + window.scrollY >= document.body.offsetHeight && !hasMore) {
       setSize((size) => size + 1);
