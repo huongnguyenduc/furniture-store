@@ -45,6 +45,7 @@ const SignUp = () => {
     },
   });
   const [formError, setFormError] = React.useState<string | null>(null);
+  const [isSigningUp, setIsSigningUp] = React.useState<boolean>(false);
   return (
     <Container size="xs" py={96}>
       <Box>
@@ -63,7 +64,9 @@ const SignUp = () => {
       <Box>
         <form
           onSubmit={form.onSubmit(async (values) => {
+            setIsSigningUp(true);
             const registerResponse = await axiosFetcher('auth/register', 'POST', { ...values });
+            setIsSigningUp(false);
             if (registerResponse.status === 201) {
               setFormError(null);
               const res: SignInResponse | undefined = await signIn('credentials', {
@@ -154,6 +157,7 @@ const SignUp = () => {
                   backgroundColor: theme.colors.hoverBrown,
                 },
               })}
+              loading={isSigningUp}
             >
               Submit
             </Button>

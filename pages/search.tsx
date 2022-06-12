@@ -74,13 +74,27 @@ const Search = () => {
         : [parseInt(subCategories)]
       : []
   );
+  const [subCategoryIdList, setSubCategoryIdList] = React.useState<number[]>(
+    subCategories
+      ? Array.isArray(subCategories)
+        ? subCategories.map((id) => parseInt(id))
+        : [parseInt(subCategories)]
+      : []
+  );
   React.useEffect(() => {
-    setCategoryIdList((prevCategories) =>
+    setCategoryIdList(
       subCategories
         ? Array.isArray(subCategories)
           ? subCategories.map((id) => parseInt(id))
           : [parseInt(subCategories)]
-        : prevCategories
+        : []
+    );
+    setSubCategoryIdList(
+      subCategories
+        ? Array.isArray(subCategories)
+          ? subCategories.map((id) => parseInt(id))
+          : [parseInt(subCategories)]
+        : []
     );
   }, [subCategories]);
   const categoryListUrl =
@@ -121,7 +135,11 @@ const Search = () => {
       ) : (
         <SearchTitle productCount={data ? data[0].content.totalElements : 0} query={q} />
       )}
-      <FilterList selectedCategoryId={categoryIdList} setSelectedCategoryId={setCategoryIdList} />
+      <FilterList
+        selectedCategoryId={categoryIdList}
+        setSelectedCategoryId={setCategoryIdList}
+        categoryIdList={subCategoryIdList}
+      />
       <SortList
         selectedBrandId={brandIdList}
         setSelectedBrandId={setBrandIdList}

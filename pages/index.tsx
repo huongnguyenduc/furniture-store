@@ -7,15 +7,40 @@ import {
   newArrivalsCollection,
   seatingCollection,
 } from '../components/Home/Collection/CollectionData';
+import { useRef } from 'react';
 
 export default function HomePage() {
+  const collectionRef = useRef<HTMLInputElement>(null);
+  const customRef = useRef<HTMLInputElement>(null);
+  const scrollIntoCollection = () => {
+    if (collectionRef.current) {
+      collectionRef.current.scrollIntoView({
+        behavior: 'smooth',
+      });
+      console.log('abc', collectionRef);
+    }
+    console.log('def', collectionRef);
+  };
+  const scrollIntoCustom = () => {
+    if (customRef.current)
+      customRef.current.scrollIntoView({
+        behavior: 'smooth',
+      });
+  };
   return (
     <>
       <BannerSection />
-      <CustomJourneySection />
+      <CustomJourneySection
+        scrollIntoCollection={scrollIntoCollection}
+        scrollIntoCustom={scrollIntoCustom}
+      />
       <CategoryList />
-      <DifferenceSection />
-      <Collection data={seatingCollection} />
+      <div ref={customRef}>
+        <DifferenceSection />
+      </div>
+      <div ref={collectionRef}>
+        <Collection data={seatingCollection} />
+      </div>
       <Collection data={newArrivalsCollection} />
     </>
   );

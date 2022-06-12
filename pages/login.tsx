@@ -23,6 +23,7 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
   const { referrer, id } = router.query;
   const matchMd = useMediaQuery('(min-width: 992px)', false);
   const matchSm = useMediaQuery('(min-width: 768px)', false);
+  const [isLoggingIn, setIsLoggingIn] = React.useState<boolean>(false);
   const form = useForm({
     initialValues: {
       username: '',
@@ -37,12 +38,14 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
   type FormValues = typeof form.values;
   const [formError, setFormError] = React.useState<string | null>(null);
   const handleSubmit = async (values: FormValues) => {
+    setIsLoggingIn(true);
     const res: SignInResponse | undefined = await signIn('credentials', {
       redirect: false,
       username: values.username,
       password: values.password,
       callbackUrl: `${window.location.origin}`,
     });
+    setIsLoggingIn(false);
     if (res !== undefined) {
       const { error, url } = res;
       console.log(res);
@@ -126,6 +129,7 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
                     backgroundColor: theme.colors.hoverBrown,
                   },
                 })}
+                loading={isLoggingIn}
               >
                 Login
               </Button>

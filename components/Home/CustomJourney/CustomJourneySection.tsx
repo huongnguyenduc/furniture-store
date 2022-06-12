@@ -2,7 +2,13 @@ import React from 'react';
 import { Container, Text, Box, MediaQuery, Grid, Group, ActionIcon } from '@mantine/core';
 import { CustomList } from './CustomData';
 
-const CustomJourneySection = () => {
+const CustomJourneySection = ({
+  scrollIntoCollection,
+  scrollIntoCustom,
+}: {
+  scrollIntoCollection: () => void;
+  scrollIntoCustom: () => void;
+}) => {
   return (
     <Container size="xl" mt="xl">
       <MediaQuery
@@ -23,7 +29,17 @@ const CustomJourneySection = () => {
           <Grid>
             {CustomList.map((item) => (
               <Grid.Col sm={6} lg={3} key={item.title + 'listItem'}>
-                <Group noWrap sx={{ cursor: 'pointer' }}>
+                <Group
+                  noWrap
+                  sx={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    if (item.title === 'Collections') {
+                      scrollIntoCollection();
+                    } else if (item.title === 'Customization') {
+                      scrollIntoCustom();
+                    }
+                  }}
+                >
                   <ActionIcon
                     sx={(theme) => ({ color: theme.colors.deepGreen })}
                     size={48}

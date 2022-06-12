@@ -21,25 +21,42 @@ interface CategoryListResponse {
 const FilterList = ({
   selectedCategoryId,
   setSelectedCategoryId,
+  categoryIdList,
 }: {
   selectedCategoryId: number[];
   setSelectedCategoryId: React.Dispatch<React.SetStateAction<number[]>>;
+  categoryIdList: number[];
 }) => {
   const { data: session } = useSession();
-  const { data, error } = useSWR<CategoryListResponse>(() => [
+  const { data: fullData, error } = useSWR<CategoryListResponse>(() => [
     `website/categories?onlyActive=true`,
     'GET',
     {},
     session?.accessToken,
   ]);
   const matches = useMediaQuery('(min-width: 1280px)', false);
+  const data =
+    categoryIdList.length === 0
+      ? fullData
+      : fullData?.content
+      ? {
+          ...fullData,
+          content: fullData.content.filter((category) =>
+            categoryIdList.some((id) => id === category.categoryId)
+          ),
+        }
+      : undefined;
   return (
     <Box py="sm" my="sm" sx={{ top: 70, zIndex: 3, position: 'sticky', backgroundColor: 'white' }}>
       <ScrollContainer
-        style={{
-          height: 56,
-          display: 'flex',
-        }}
+        style={
+          categoryIdList.length === 0
+            ? {
+                height: 56,
+                display: 'flex',
+              }
+            : { height: 56, display: 'flex', justifyContent: 'center' }
+        }
       >
         {data?.content?.map((item, index) => {
           const isItemSelected = selectedCategoryId.some((id) => id === item.categoryId);
