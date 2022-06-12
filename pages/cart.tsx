@@ -277,6 +277,12 @@ const ShoppingCart = () => {
         ),
         color: 'blue',
       });
+    } else if (data?.content.orderDetails.length === 0) {
+      showNotification({
+        title: 'Warning',
+        message: 'There is no item in your cart!',
+        color: 'yellow',
+      });
     } else {
       const checkoutCartResponse = await axiosFetcher(
         'orders/user/checkout',
@@ -312,7 +318,7 @@ const ShoppingCart = () => {
           </Box>
         </Box>
       </Container>
-      {!!!data?.content ? (
+      {!!!data?.content || data.content.orderDetails.length === 0 ? (
         <Box className={`${classes.cartContainer} ${classes.cartContainerTop}`}>
           <Box className={classes.cartRow}>
             <Box className={`${classes.cartImage} ${classes.cartCol}`}>

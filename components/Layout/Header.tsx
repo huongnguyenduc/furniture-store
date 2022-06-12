@@ -103,10 +103,20 @@ function CategoryHeader({
                         key={`${subItem.toString()}-header`}
                         onClick={() => {
                           if (typeof subItem !== 'string') {
+                            const subCategoriesUrl =
+                              typeof item.items[0] === 'string'
+                                ? ''
+                                : item.items
+                                    .map((_subItem) =>
+                                      typeof _subItem === 'string'
+                                        ? ''
+                                        : `&subCategories=${_subItem.categoryId}`
+                                    )
+                                    .join('');
                             Router.push(
-                              `/search?q=${''}&category=${item.categoryId}&subCategories=${
-                                subItem.categoryId
-                              }`
+                              `/search?q=${''}&category=${
+                                item.categoryId
+                              }${subCategoriesUrl}&selectedCategory=${subItem.categoryId}`
                             );
                           }
                         }}

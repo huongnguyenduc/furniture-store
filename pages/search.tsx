@@ -56,7 +56,7 @@ function reachEnd(
 
 const Search = () => {
   const router = useRouter();
-  const { q, subCategories, category } = router.query;
+  const { q, subCategories, category, selectedCategory } = router.query;
   const { data: categoryData } = useSWR<CategoryResponse>(() => [
     `website/categories/${category}`,
     'GET',
@@ -82,13 +82,17 @@ const Search = () => {
       : []
   );
   React.useEffect(() => {
-    setCategoryIdList(
-      subCategories
-        ? Array.isArray(subCategories)
-          ? subCategories.map((id) => parseInt(id))
-          : [parseInt(subCategories)]
-        : []
-    );
+    if (selectedCategory) {
+      setCategoryIdList([parseInt(selectedCategory.toString())]);
+    } else {
+      setCategoryIdList(
+        subCategories
+          ? Array.isArray(subCategories)
+            ? subCategories.map((id) => parseInt(id))
+            : [parseInt(subCategories)]
+          : []
+      );
+    }
     setSubCategoryIdList(
       subCategories
         ? Array.isArray(subCategories)
@@ -96,7 +100,7 @@ const Search = () => {
           : [parseInt(subCategories)]
         : []
     );
-  }, [subCategories]);
+  }, [subCategories, selectedCategory]);
   const categoryListUrl =
     categoryIdList.length === 0 ? '' : categoryIdList.map((id) => `&categoryId=${id}`).join('');
   const { data, error, size, setSize } = useSWRInfinite<SearchPage>((index) => [

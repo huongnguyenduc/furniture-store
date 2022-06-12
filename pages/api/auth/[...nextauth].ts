@@ -36,7 +36,7 @@ export default NextAuth({
         // If no error and we have user data, return it
         if (res.ok && user) {
           console.log(user);
-          return user;
+          return user.content.token;
         }
 
         // Return null if user data could not be retrieved
@@ -56,7 +56,7 @@ export default NextAuth({
       if (account && user) {
         return {
           ...token,
-          accessToken: user.content,
+          accessToken: user,
           //   refreshToken: account.refresh_token,
         };
       }
