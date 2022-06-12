@@ -1,5 +1,5 @@
 import React, { Dispatch, SetStateAction } from 'react';
-import { Box, Image as ImageMantine, Loader } from '@mantine/core';
+import { Box, Image as ImageMantine, Loader, Text } from '@mantine/core';
 import { createStyles } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
 import { Variant, Option } from '../../pages/product';
@@ -265,11 +265,13 @@ const RotateImage = ({
   variants,
   selectedVariant,
   setSelectedOptions,
+  errors,
 }: {
   image: string | undefined;
   variants: Variant[] | undefined;
   selectedVariant: Variant | undefined;
   setSelectedOptions: React.Dispatch<React.SetStateAction<Option[]>>;
+  errors: string | undefined;
 }) => {
   const [imageIndex, setImageIndex] = React.useState(1);
   const [changeImagePosition, setChangeImagePosition] = React.useState(0);
@@ -369,6 +371,22 @@ const RotateImage = ({
               </li>
             ))}
         </ul>
+      ) : errors && errors === 'Variant not found' ? (
+        <Text
+          sx={{
+            position: 'absolute',
+            backgroundSize: 'contain',
+            left: '50%',
+            transform: 'translate(-50%, 600%)',
+            userSelect: 'none',
+            pointerEvents: 'none',
+            display: 'block',
+            textAlign: 'center',
+            zIndex: 110,
+          }}
+        >
+          This variant is out of stock!
+        </Text>
       ) : (
         <Loader
           color="grey"

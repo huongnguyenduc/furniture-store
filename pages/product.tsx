@@ -324,7 +324,7 @@ interface ProductResponse {
 
 interface VariantResponse {
   content: Variant;
-  error: string;
+  errors: string;
   status: number;
   timestamp: string;
 }
@@ -355,6 +355,7 @@ const Product = () => {
   const { data: selectedVariant, error: variantError } = useSWR<VariantResponse>(
     selectedOptionUrl ? () => [`website/variants/search?productId=${id}${selectedOptionUrl}`] : null
   );
+  console.log('selected variants', selectedVariant);
   const { data: optionData, error: optionError } = useSWR<OptionResponse>(() => [
     `website/products/${id}/option`,
   ]);
@@ -483,6 +484,7 @@ const Product = () => {
               variants={data?.content.variants}
               selectedVariant={selectedVariant?.content}
               setSelectedOptions={setSelectedOptions}
+              errors={selectedVariant?.errors}
             />
           </Box>
           <Box className={classes.productColCart}>
