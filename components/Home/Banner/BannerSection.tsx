@@ -38,7 +38,7 @@ const BannerSection = () => {
               seeing spring
             </Text>
             <Text size="md" weight={300} sx={(theme) => ({ color: theme.colors.deepBlue })}>
-              Customize in full bloom. 15% off ends 22/4.
+              Customize in full bloom. 15% off ends 15/6.
             </Text>
           </Box>
         </MediaQuery>
