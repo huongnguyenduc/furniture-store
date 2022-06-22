@@ -69,29 +69,31 @@ const SignUp = () => {
             setIsSigningUp(false);
             if (registerResponse.status === 201) {
               setFormError(null);
-              const res: SignInResponse | undefined = await signIn('credentials', {
-                redirect: false,
-                username: values.username,
-                password: values.password,
-                callbackUrl: `${window.location.origin}`,
+              showNotification({
+                title: 'Verifying your email!',
+                message: 'Wait to confirm your email',
+                color: 'yellow',
               });
-              if (res !== undefined) {
-                const { error, url } = res;
-                console.log(res);
-                if (error) {
-                  setFormError(error);
-                } else {
-                  setFormError(null);
-                }
-                if (url) {
-                  Router.push(url);
-                  showNotification({
-                    title: 'Success!',
-                    message: 'Your account is created successfully! 🤥',
-                    color: 'blue',
-                  });
-                }
-              }
+              Router.push(`/login?registering=${values.email}`);
+              // const res: SignInResponse | undefined = await signIn('credentials', {
+              //   redirect: false,
+              //   username: values.username,
+              //   password: values.password,
+              //   callbackUrl: `${window.location.origin}`,
+              // });
+              // if (res !== undefined) {
+              //   const { error, url } = res;
+              //   console.log(res);
+              //   if (error) {
+              //     setFormError(error);
+              //   } else {
+              //     setFormError(null);
+              //   }
+              //   if (url) {
+              //     Router.push(url);
+
+              // }
+              // }
             } else {
               setFormError(registerResponse.error);
             }
