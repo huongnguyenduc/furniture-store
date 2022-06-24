@@ -53,7 +53,6 @@ const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
     setIsLoggingIn(false);
     if (res !== undefined) {
       const { error, url } = res;
-      console.log(res);
       if (error) {
         setFormError(error);
       } else {

@@ -26,16 +26,13 @@ export default NextAuth({
             'Content-Type': 'application/json',
           },
         });
-        console.log(res);
 
         const user = await res.json();
-        console.log(user);
         if (!res.ok) {
           throw new Error(user.content);
         }
         // If no error and we have user data, return it
         if (res.ok && user) {
-          console.log(user);
           return user.content.token;
         }
 

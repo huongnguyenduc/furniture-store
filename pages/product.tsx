@@ -355,7 +355,6 @@ const Product = () => {
   const { data: selectedVariant, error: variantError } = useSWR<VariantResponse>(
     selectedOptionUrl ? () => [`website/variants/search?productId=${id}${selectedOptionUrl}`] : null
   );
-  console.log('selected variants', selectedVariant);
   const { data: optionData, error: optionError } = useSWR<OptionResponse>(() => [
     `website/products/${id}/option`,
   ]);

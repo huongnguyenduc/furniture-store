@@ -304,10 +304,8 @@ const RotateImage = ({
     if (dragX % 24 === 0) {
       if (dragX > changeImagePosition) {
         setImageIndex((imageOld) => (imageOld === 32 ? 1 : imageOld + 1));
-        console.log('right', dragX);
       } else if (dragX < changeImagePosition) {
         setImageIndex((imageOld) => (imageOld === 1 ? 32 : imageOld - 1));
-        console.log('left', dragX);
       }
       setChangeImagePosition(dragX);
     }

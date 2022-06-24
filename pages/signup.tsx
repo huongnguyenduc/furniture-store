@@ -83,7 +83,6 @@ const SignUp = () => {
               // });
               // if (res !== undefined) {
               //   const { error, url } = res;
-              //   console.log(res);
               //   if (error) {
               //     setFormError(error);
               //   } else {
@@ -97,7 +96,6 @@ const SignUp = () => {
             } else {
               setFormError(registerResponse.error);
             }
-            console.log(values);
           })}
           style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}
           autoComplete="off"

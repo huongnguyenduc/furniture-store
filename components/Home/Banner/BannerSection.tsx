@@ -35,10 +35,10 @@ const BannerSection = () => {
               mb="xl"
               sx={(theme) => ({ color: theme.colors.deepBlue, fontSize: matches ? 64 : 48 })}
             >
-              seeing spring
+              seeing summer
             </Text>
             <Text size="md" weight={300} sx={(theme) => ({ color: theme.colors.deepBlue })}>
-              Customize in full bloom. 15% off ends 15/6.
+              Customize in full bloom. 15% off ends 30/6.
             </Text>
           </Box>
         </MediaQuery>

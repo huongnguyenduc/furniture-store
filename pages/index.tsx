@@ -17,9 +17,7 @@ export default function HomePage() {
       collectionRef.current.scrollIntoView({
         behavior: 'smooth',
       });
-      console.log('abc', collectionRef);
     }
-    console.log('def', collectionRef);
   };
   const scrollIntoCustom = () => {
     if (customRef.current)
