@@ -339,7 +339,7 @@ interface OptionResponse {
 
 export const getServerSideProps: GetServerSideProps = async ({params}) => {
   if (params && params.id) {
-    const product = await axiosFetcher(`website/products/${params.id}`);
+    const product= await axiosFetcher(`website/products/${params.id}`);
     return {
       props: {
         fallback: {
