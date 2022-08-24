@@ -2,7 +2,6 @@ import { Box, Button, Container, Group, PasswordInput, Text, TextInput } from '@
 import { useForm } from '@mantine/form';
 import React from 'react';
 import { axiosFetcher } from '../utils/fetcher';
-import { signIn, getCsrfToken, SignInResponse } from 'next-auth/react';
 import Router from 'next/router';
 import { showNotification } from '@mantine/notifications';
 

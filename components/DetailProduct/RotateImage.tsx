@@ -406,7 +406,7 @@ const RotateImage = ({
           {matchSm ? (
             <ImageMantine
               className={classes.productImageRotate}
-              src="https://media.interiordefine.com/skin/frontend/interiordefine/default/images/cylindo-arrows-desk.svg"
+              src="https://www.interiordefine.com/media/storage/cylindo-arrows-desk.png"
             />
           ) : (
             <></>
