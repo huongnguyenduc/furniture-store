@@ -15,7 +15,7 @@ import { createStyles } from '@mantine/core';
 import AccordionLabel from '../components/DetailProduct/AccordionLabel';
 import { useMediaQuery } from '@mantine/hooks';
 import Router, { useRouter } from 'next/router';
-import useSWR, { unstable_serialize } from 'swr';
+import useSWR, { SWRConfig, unstable_serialize } from 'swr';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import OptionItem from '../components/DetailProduct/OptionItem';
 import React from 'react';
@@ -337,13 +337,15 @@ interface OptionResponse {
   timestamp: string;
 }
 
-export const getServerSideProps: GetServerSideProps = async ({params}) => {
-  if (params && params.id) {
-    const product= await axiosFetcher(`website/products/${params.id}`);
+export const getServerSideProps: GetServerSideProps = async ({query}) => {
+  console.log(query);
+  if (query && query.id) {
+    console.log(query.id);
+    const product = await axiosFetcher(`website/products/${query.id}`);
     return {
       props: {
         fallback: {
-          [unstable_serialize([`website/products/${params.id}`])]: product,
+          [unstable_serialize(() => [`website/products/${query.id}`])]: product,
         }
       }
     }
@@ -355,6 +357,14 @@ export const getServerSideProps: GetServerSideProps = async ({params}) => {
     }
 }
 
+export default function ProductPage({fallback}: {fallback: any}) {
+  return (
+    <SWRConfig value={{fallback}}>
+      <Product />
+    </SWRConfig>
+  )
+}
+
 const Product = () => {
   const { classes } = useStyles();
   const matches = useMediaQuery('(min-width: 992px)', false);
@@ -362,7 +372,7 @@ const Product = () => {
   const { id } = router.query;
   const { data: session } = useSession();
   const [selectedOptions, setSelectedOptions] = React.useState<Option[]>([]);
-  const { data, error } = useSWR<ProductResponse>(() => [`website/products/${id}`], {
+  const { data, error } = useSWR<ProductResponse>(() => [`website/products/${id}`], axiosFetcher, {
     onSuccess: (data) => {
       setSelectedOptions(data.content.variants[0].options);
     },
@@ -626,5 +636,3 @@ const Product = () => {
     </>
   );
 };
-
-export default Product;
