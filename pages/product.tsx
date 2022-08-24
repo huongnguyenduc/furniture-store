@@ -304,7 +304,7 @@ export interface Variant {
   variantId: number;
   quantity: number;
 }
-interface Product {
+export interface Product {
   brandId: number;
   brandName: string;
   categoryId: number;
@@ -360,12 +360,12 @@ export const getServerSideProps: GetServerSideProps = async ({query}) => {
 export default function ProductPage({fallback}: {fallback: any}) {
   return (
     <SWRConfig value={{fallback}}>
-      <Product />
+      <ProductView />
     </SWRConfig>
   )
 }
 
-const Product = () => {
+const ProductView = () => {
   const { classes } = useStyles();
   const matches = useMediaQuery('(min-width: 992px)', false);
   const router = useRouter();

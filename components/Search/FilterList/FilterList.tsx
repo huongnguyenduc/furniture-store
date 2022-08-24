@@ -1,7 +1,6 @@
 import { Box, Text } from '@mantine/core';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import { useMediaQuery } from '@mantine/hooks';
-import Product from '../../../pages/product';
 import useSWR from 'swr';
 import { useSession } from 'next-auth/react';
 
@@ -9,7 +8,6 @@ interface CategoryData {
   categoryId: number;
   categoryName: string;
   categoryDesc: string;
-  product: Product[];
 }
 interface CategoryListResponse {
   content: CategoryData[];
