@@ -362,7 +362,7 @@ const Product = () => {
   const { id } = router.query;
   const { data: session } = useSession();
   const [selectedOptions, setSelectedOptions] = React.useState<Option[]>([]);
-  const { data, error } = useSWR<ProductResponse>(() => [`website/products/${id}`], axiosFetcher, {
+  const { data, error } = useSWR<ProductResponse>(() => [`website/products/${id}`], {
     onSuccess: (data) => {
       setSelectedOptions(data.content.variants[0].options);
     },

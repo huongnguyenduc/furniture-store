@@ -12,14 +12,12 @@ import {
   TextInput,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
-import Link from 'next/link';
 import Router, { useRouter } from 'next/router';
 import React from 'react';
 import { signIn, getCsrfToken, SignInResponse } from 'next-auth/react';
 import { GetServerSideProps } from 'next';
 import { useForm } from '@mantine/form';
 import { axiosFetcher } from '../utils/fetcher';
-import { showNotification } from '@mantine/notifications';
 
 const Login = ({ csrfToken }: { csrfToken: string | undefined }) => {
   const router = useRouter();
