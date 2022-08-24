@@ -1,12 +1,11 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import { Box, Button, Container, Grid, Loader } from '@mantine/core';
+import { Box, Container, Grid, Loader } from '@mantine/core';
 import FilterList from '../components/Search/FilterList/FilterList';
 import ProductItem from '../components/ProductItem';
 import SearchTitle from '../components/Search/Title/SearchTitle';
 import useSWR from 'swr';
 import useSWRInfinite from 'swr/infinite';
-import { useSession } from 'next-auth/react';
 import SortList from '../components/Search/SortList/SortList';
 import CategoryTitle from '../components/Search/Title/CategoryTitle';
 
@@ -42,16 +41,6 @@ interface CategoryResponse {
   error: string;
   status: number;
   timestamp: string;
-}
-
-function reachEnd(
-  event: any,
-  setSize: (size: number | ((_size: number) => number)) => Promise<SearchPage[] | undefined>,
-  hasMore: boolean | undefined
-) {
-  if (window.innerHeight + window.scrollY >= document.body.offsetHeight && hasMore) {
-    setSize((size) => size + 1);
-  }
 }
 
 const Search = () => {

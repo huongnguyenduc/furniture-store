@@ -15,7 +15,7 @@ import { createStyles } from '@mantine/core';
 import AccordionLabel from '../components/DetailProduct/AccordionLabel';
 import { useMediaQuery } from '@mantine/hooks';
 import Router, { useRouter } from 'next/router';
-import useSWR from 'swr';
+import useSWR, { unstable_serialize } from 'swr';
 import ScrollContainer from 'react-indiana-drag-scroll';
 import OptionItem from '../components/DetailProduct/OptionItem';
 import React from 'react';
@@ -24,6 +24,7 @@ import { useSession } from 'next-auth/react';
 import * as _ from 'lodash';
 import { axiosFetcher } from '../utils/fetcher';
 import { showNotification } from '@mantine/notifications';
+import { GetServerSideProps } from 'next';
 
 const useStyles = createStyles((theme, _params) => ({
   breadcrumbsContainer: {
@@ -334,6 +335,24 @@ interface OptionResponse {
   error: string;
   status: number;
   timestamp: string;
+}
+
+export const getServerSideProps: GetServerSideProps = async ({params}) => {
+  if (params && params.id) {
+    const product = await axiosFetcher(`website/products/${params.id}`);
+    return {
+      props: {
+        fallback: {
+          [unstable_serialize([`website/products/${params.id}`])]: product,
+        }
+      }
+    }
+  }
+    return {
+      props: {
+        
+      }
+    }
 }
 
 const Product = () => {
